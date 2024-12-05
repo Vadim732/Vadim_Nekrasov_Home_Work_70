@@ -1,0 +1,32 @@
+﻿@model User
+
+@{
+    ViewBag.Title = "User profile";
+}
+
+<div class="mt-4">
+    <div class="row align-items-center">
+        <div class="col-md-3 text-center">
+            <img src="@Model.Avatar" class="img-thumbnail avatar-block rounded-circle" alt="User avatar">
+        </div>
+        <div class="col-md-9">
+            <div class="d-flex align-items-center mb-2">
+                <h2 class="me-3">@Model.UserName</h2>
+                @if (User.IsInRole("employer, applicant"))
+                {
+                    <a asp-action="Edit" asp-controller="Account" asp-route-userId="@ViewBag.currentUserId" class="btn btn-outline-secondary"><i class="fa-solid fa-user-pen"></i> Редактировать</a>
+                }
+            </div>
+            <h6 class="text-muted"><i class="fa-solid fa-calendar-days"></i> @Model.DateOfBirth.ToString("dd.MM.yyyy")</h6>
+            <div class="mt-4">
+                @if (User.IsInRole("admin"))
+                {
+                    <a class="btn btn-outline-dark" asp-controller="Account" asp-action="RegisterUser"><i class="fa-solid fa-user-plus"></i> Создать пользователя</a>
+                    <a class="btn btn-outline-dark ml-1" asp-controller="Account" asp-action="Index"><i class="fa-solid fa-users"></i> Все пользователи</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<p>@Model.PhoneNumber временно побудет здесь</p>
