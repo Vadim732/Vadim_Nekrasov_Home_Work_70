@@ -23,6 +23,15 @@
                     <li class="nav-item ml-2">
                         @* <a class="btn btn-outline-light" asp-controller="" asp-action=""><i class="fa-solid fa-plus"></i>  Создать</a> *@
                     </li>
+                    @if (User.IsInRole("admin"))
+                    {
+                        <li class="nav-item me-3">
+                            <a class="btn btn-light nav-link text-dark" href="@Url.Action("CreateCategory", "HeadHunter")">Создать новую категорию</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-light nav-link text-dark" href="@Url.Action("IndexCategories", "HeadHunter")">Все категории</a>
+                        </li>
+                    }
                 </ul>
                 <ul class="navbar-nav d-flex">
                     @if (User.Identity.IsAuthenticated)

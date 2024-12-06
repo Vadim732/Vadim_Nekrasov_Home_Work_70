@@ -1,0 +1,23 @@
+@model List<Category>
+
+@{
+    ViewBag.Title = "Все категории";
+}
+
+<div class="container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Название категории</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <th>@category.Name</th>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
