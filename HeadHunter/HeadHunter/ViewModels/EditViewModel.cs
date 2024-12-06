@@ -18,9 +18,8 @@ public class EditViewModel
     [RegularExpression(@"^(\+?\d{1,4}[\s-]?)?(\(?\d{2,5}\)?[\s-]?)?[\d\s-]{5,15}$", ErrorMessage = "Введите корректный номер телефона!")]
     public string PhoneNumber { get; set; }
     
-    [Required(ErrorMessage = "Неверная ссылка на аватар!")]
-    [Url]
-    public string Avatar { get; set; }
+    [Url(ErrorMessage = "Неверная ссылка на аватар!")]
+    public string? Avatar { get; set; }
 
     [Required(ErrorMessage = "Требуется пароль!")]
     [MinLength(6, ErrorMessage = "Пароль должен содержать не менее 6 символов!")]

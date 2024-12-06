@@ -7,17 +7,28 @@
 <div class="mt-4">
     <div class="row align-items-center">
         <div class="col-md-3 text-center">
-            <img src="@Model.Avatar" class="img-thumbnail avatar-block rounded-circle" alt="User avatar">
+            @if (Model.Avatar != null)
+            {
+                <img src="@Model.Avatar" class="img-thumbnail avatar-block rounded-circle" alt="User avatar">
+            }
+            else
+            {
+                <img src="https://i.pinimg.com/736x/6f/0b/3b/6f0b3baa01e2136b2e2d93709e622e2c.jpg" class="img-thumbnail avatar-block rounded-circle" alt="User avatar">
+            }
         </div>
         <div class="col-md-9">
             <div class="d-flex align-items-center mb-2">
                 <h2 class="me-3">@Model.UserName</h2>
-                @if (User.IsInRole("employer, applicant"))
+                @if (!User.IsInRole("admin"))
                 {
                     <a asp-action="Edit" asp-controller="Account" asp-route-userId="@ViewBag.currentUserId" class="btn btn-outline-secondary"><i class="fa-solid fa-user-pen"></i> Редактировать</a>
+                    @* <button type="button" asp-action="Edit" asp-controller="Account" asp-route-userId="@ViewBag.currentUserId" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal-@Model.Id"> *@
+                    @*     <i class="fa-solid fa-user-pen"></i> Редактировать *@
+                    @* </button> *@
                 }
             </div>
-            <h6 class="text-muted"><i class="fa-solid fa-calendar-days"></i> @Model.DateOfBirth.ToString("dd.MM.yyyy")</h6>
+            <h6 class="text-muted mt-3"><i class="fa-solid fa-phone"></i> @Model.PhoneNumber</h6>
+            <h6 class="text-muted mt-1"><i class="fa-solid fa-calendar-days"></i> @Model.DateOfBirth.ToString("dd.MM.yyyy")</h6>
             <div class="mt-4">
                 @if (User.IsInRole("admin"))
                 {
@@ -36,8 +47,6 @@
         </div>
     </div>
 </div>
-
-<p>@Model.PhoneNumber временно побудет здесь</p>
 
 @if (User.IsInRole("employer"))
 {
@@ -78,3 +87,56 @@
         }
     </div>
 }
+
+@* <div class="modal fade" id="modal-@Model.Id" tabindex="-1" aria-labelledby="modalLabel-@Model.Id" aria-hidden="true"> *@
+@*     <div class="modal-dialog"> *@
+@*         <div class="modal-content"> *@
+@*             <div class="modal-header"> *@
+@*                 <h1 class="modal-title fs-5" id="modalLabel-@Model.Id"><i class="fa-solid fa-pen"></i> Редактировать аккаунт</h1> *@
+@*                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
+@*             </div> *@
+@*             <div class="modal-body bg-dark text-white"> *@
+@*                 <form asp-action="Edit" asp-controller="Account" asp-anti-forgery="true"> *@
+@*                     <div asp-validation-summary="ModelOnly" class="text-error"></div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="UserName" class="form-label">Логин</label> *@
+@*                         <input type="text" id="UserName" class="form-control w-100" asp-for="UserName" placeholder="Введите логин..."> *@
+@*                         <span asp-validation-for="UserName" class="text-error"></span> *@
+@*                     </div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="Email" class="form-label">Электронная почта</label> *@
+@*                         <input type="email" id="Email" class="form-control w-100" asp-for="Email" placeholder="Введите ваш адрес электронной почты..."> *@
+@*                         <span asp-validation-for="Email" class="text-error"></span> *@
+@*                         @if (ViewBag.ErrorMessage != null) *@
+@*                         { *@
+@*                             <span class="text-error">@ViewBag.ErrorMessage</span> *@
+@*                         } *@
+@*                     </div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="DateOfBirth" class="form-label">Дата рождения</label> *@
+@*                         <input type="date" id="DateOfBirth" class="form-control w-100" asp-for="DateOfBirth" placeholder="Укажите дату рождения..."> *@
+@*                         <span asp-validation-for="DateOfBirth" class="text-error"></span> *@
+@*                     </div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="Avatar" class="form-label">Ссылка на аватар</label> *@
+@*                         <input type="text" id="Avatar" class="form-control w-100" asp-for="Avatar" placeholder="Введите ссылку на аватар..."> *@
+@*                         <span asp-validation-for="Avatar" class="text-error"></span> *@
+@*                     </div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="PhoneNumber" class="form-label">Номер телефона</label> *@
+@*                         <input type="number" id="PhoneNumber" class="form-control w-100" asp-for="PhoneNumber" placeholder="Укажите номер телефона..."> *@
+@*                         <span asp-validation-for="PhoneNumber" class="text-error"></span> *@
+@*                     </div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="Password" class="form-label">Пароль</label> *@
+@*                         <input type="password" id="Password" class="form-control w-100" asp-for="PhoneNumber" placeholder="Укажите номер телефона..."> *@
+@*                         <span asp-validation-for="Password" class="text-error"></span> *@
+@*                     </div> *@
+@*                     <div class="d-flex justify-content-center mt-3"> *@
+@*                         <button type="submit" class="btn btn-outline-light w-50"><i class="fa-solid fa-floppy-disk"></i> Сохранить</button> *@
+@*                     </div> *@
+@*                 </form> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@

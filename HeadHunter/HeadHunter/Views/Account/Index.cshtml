@@ -16,7 +16,14 @@
     {
         <tr>
             <td>
-                <img src="@a.Avatar" alt="User avatar" class="rounded-circle me-2 comment-user-avatar">
+                @if (a.Avatar != null)
+                {
+                    <img src="@a.Avatar" alt="User avatar" class="rounded-circle me-2 comment-user-avatar">
+                }
+                else
+                {
+                    <img src="https://i.pinimg.com/736x/6f/0b/3b/6f0b3baa01e2136b2e2d93709e622e2c.jpg" alt="User avatar" class="rounded-circle me-2 comment-user-avatar">
+                }
                 <strong class="mb-0">@a.UserName</strong>
             </td>
             <td>

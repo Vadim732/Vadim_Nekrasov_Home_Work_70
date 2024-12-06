@@ -12,9 +12,8 @@ public class UserEditViewModel
     [EmailAddress(ErrorMessage = "Неверный адрес электронной почты!")]
     public string Email { get; set; }
     
-    [Required(ErrorMessage = "Неверная ссылка на аватар!")]
-    [Url]
-    public string Avatar { get; set; }
+    [Url(ErrorMessage = "Неверная ссылка на аватар!")]
+    public string? Avatar { get; set; }
     
     [Required(ErrorMessage = "Укажите номер телефона!")]
     [RegularExpression(@"^(\+?\d{1,4}[\s-]?)?(\(?\d{2,5}\)?[\s-]?)?[\d\s-]{5,15}$", ErrorMessage = "Введите корректный номер телефона!")]
