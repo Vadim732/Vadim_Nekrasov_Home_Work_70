@@ -24,9 +24,57 @@
                     <a class="btn btn-outline-dark" asp-controller="Account" asp-action="RegisterUser"><i class="fa-solid fa-user-plus"></i> Создать пользователя</a>
                     <a class="btn btn-outline-dark ml-1" asp-controller="Account" asp-action="Index"><i class="fa-solid fa-users"></i> Все пользователи</a>
                 }
+                @if (User.IsInRole("employer"))
+                {
+                    <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateVacancy">Создать Вакансию</a>
+                }
+                @if (User.IsInRole("applicant"))
+                {
+                    <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateResume">Создать Резюме</a>
+                }
             </div>
         </div>
     </div>
 </div>
 
 <p>@Model.PhoneNumber временно побудет здесь</p>
+
+@if (User.IsInRole("employer"))
+{
+    <div class="mt-4">
+        <h3>Вакансии</h3>
+        @if (ViewBag.Vacancies != null && ViewBag.Vacancies.Count > 0)
+        {
+            <ul>
+                @foreach (var vacancy in ViewBag.Vacancies)
+                {
+                    <li>@vacancy.Title - @vacancy.Description</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>У вас нет созданных вакансий.</p>
+        }
+    </div>
+}
+
+@if (User.IsInRole("applicant"))
+{
+    <div class="mt-4">
+        <h3>Резюме</h3>
+        @if (ViewBag.Resumes != null && ViewBag.Resumes.Count > 0)
+        {
+            <ul>
+                @foreach (var resume in ViewBag.Resumes)
+                {
+                    <li>@resume.Title - @resume.Skills</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>У вас нет созданных резюме.</p>
+        }
+    </div>
+}

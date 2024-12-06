@@ -37,9 +37,53 @@ public class HeadHunterController : Controller
         }
         return View();
     }
-
+    [Authorize(Roles = "admin")]
     public IActionResult IndexCategories()
     {
         return View(_context.Categories.ToList());
+    }
+
+    public IActionResult CreateVacancy()
+    {
+        ViewBag.Categories = _context.Categories.ToList();
+        return View();
+    }
+    [HttpPost]
+    [Authorize(Roles = "employer")]
+    public IActionResult CreateVacancy(Vacancy vacancy)
+    {
+        if (ModelState.IsValid)
+        {
+            var creator = _userManager.GetUserAsync(User);
+            vacancy.UpdatedAt = DateTime.UtcNow;
+            vacancy.EmployerId = creator.Id;
+            _context.Vacancies.Add(vacancy);
+            _context.SaveChanges();
+            return RedirectToAction("Profile", "Account");
+        }
+        ViewBag.Categories = _context.Categories.ToList();
+        return View(vacancy);
+    }
+
+    public IActionResult CreateResume()
+    {
+        ViewBag.Categories = _context.Categories.ToList();
+        return View();
+    }
+    [HttpPost]
+    [Authorize(Roles = "applicant")]
+    public IActionResult CreateResume(Resume resume)
+    {
+        if (ModelState.IsValid)
+        {
+            var creator = _userManager.GetUserAsync(User);
+            resume.LastUpdated = DateTime.UtcNow;
+            resume.UserId = creator.Id;
+            _context.Resumes.Add(resume);
+            _context.SaveChanges();
+            return RedirectToAction("Profile", "Account");
+        }
+        ViewBag.Categories = _context.Categories.ToList();
+        return View(resume);
     }
 }

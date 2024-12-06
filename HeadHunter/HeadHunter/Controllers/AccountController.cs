@@ -3,6 +3,7 @@ using HeadHunter.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Delivery.Controllers;
@@ -24,8 +25,29 @@ public class AccountController : Controller
     public async Task<IActionResult> Profile()
     {
         User user = await _userManager.GetUserAsync(User);
+
         if (user != null)
         {
+            if (User.IsInRole("employer"))
+            {
+                var employerVacancies = await _context.Vacancies
+                    .Where(v => v.EmployerId == user.Id)
+                    .Include(v => v.Category)
+                    .Include(v => v.Employer)
+                    .ToListAsync();
+                ViewBag.Vacancies = employerVacancies;
+            }
+            else if (User.IsInRole("applicant"))
+            {
+                var applicantResumes = await _context.Resumes
+                    .Where(r => r.UserId == user.Id)
+                    .Include(r => r.Category)
+                    .Include(r => r.WorkExperiences)
+                    .Include(r => r.EducationAndCourses)
+                    .ToListAsync();
+                ViewBag.Resumes = applicantResumes;
+            }
+
             return View(user);
         }
         return RedirectToAction("Login", "Account");
