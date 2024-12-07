@@ -10,7 +10,7 @@
         <div asp-validation-summary="ModelOnly" class="text-error"></div>
         <div class="form_row mb-3">
             <label for="" class="col-4">
-                <input type="text" class="form-control" asp-for="UserName" placeholder="Введите логин...">
+                <input type="text" id="UserName" class="form-control" asp-for="UserName" placeholder="Введите логин...">
                 <span asp-validation-for="UserName" class="text-error" />
             </label>
         </div>
@@ -42,9 +42,9 @@
                 <span asp-validation-for="PhoneNumber" class="text-error" />
             </label>
         </div>
-        <div class="form_row mb-3">
+        <<div class="form_row mb-3">
             <label for="" class="col-4">
-                <select class="form-control" asp-for="Role">
+                <select id="Role" class="form-control" asp-for="Role">
                     <option value="" disabled selected>Выберите роль</option>
                     <option value="employer">Работодатель</option>
                     <option value="applicant">Соискатель</option>
@@ -91,6 +91,21 @@
         }
         $(document).on("click", "#toggle-password, #toggle-confirm-password", function () {
             togglePasswordVisibility();
+        });
+        $(document).ready(function () {
+             const roleSelect = $("#Role");
+             const userNameInput = $("#UserName");
+             console.log("Role select found:", roleSelect.length);
+             console.log("UserName input found:", userNameInput.length);
+             roleSelect.on("change", function () {
+                 const selectedRole = $(this).val();
+                 console.log("Selected role:", selectedRole);
+                 if (selectedRole === "employer") {
+                     userNameInput.attr("placeholder", "Укажите название заведения...");
+                 } else if (selectedRole === "applicant") {
+                     userNameInput.attr("placeholder", "Введите логин...");
+                 }
+             });
         });
     </script>
 }
