@@ -4,18 +4,18 @@
     ViewBag.Title = "Все категории";
 }
 
-<div class="container">
-    <table class="table">
-        <thead>
+<div class="mt-2">
+    <table class="table table-striped">
+        <thead class="table-dark">
         <tr>
-            <th>Название категории</th>
+            <th><h5 class="text-white ml-1"><i class="fa-solid fa-folder-open HHL"></i> Название категории</h5></th>
         </tr>
         </thead>
         <tbody>
         @foreach (var category in Model)
         {
             <tr>
-                <th>@category.Name</th>
+                <th><i class="fa-solid fa-folder text-secondary"></i> @category.Name</th>
             </tr>
         }
         </tbody>
