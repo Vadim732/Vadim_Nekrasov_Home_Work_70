@@ -1,0 +1,53 @@
+@model HeadHunter.Models.Vacancy
+
+@{
+    ViewBag.Title = "Редактирование вакансии";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center">Редактирование вакансии</h1>
+    <form asp-action="EditVacancy" asp-controller="HeadHunter" method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="Title" class="form-label">Название вакансии</label>
+            <input asp-for="Title" class="form-control" id="Title" placeholder="Введите название вакансии" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="Salary" class="form-label">Зарплата</label>
+            <input asp-for="Salary" class="form-control" id="Salary" placeholder="Укажите зарплату" />
+            <span asp-validation-for="Salary" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="Description" class="form-label">Описание вакансии</label>
+            <textarea asp-for="Description" class="form-control" id="Description" rows="5" placeholder="Опишите вакансию"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="ExperienceRequiredFrom" class="form-label">Опыт работы (от, лет)</label>
+            <input asp-for="ExperienceRequiredFrom" class="form-control" id="ExperienceRequiredFrom" placeholder="Минимальный опыт работы" />
+            <span asp-validation-for="ExperienceRequiredFrom" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="ExperienceRequiredTo" class="form-label">Опыт работы (до, лет)</label>
+            <input asp-for="ExperienceRequiredTo" class="form-control" id="ExperienceRequiredTo" placeholder="Максимальный опыт работы" />
+            <span asp-validation-for="ExperienceRequiredTo" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="CategoryId" class="form-label">Категория</label>
+            <select asp-for="CategoryId" class="form-select">
+                <option value="">Выберите категорию</option>
+                @foreach (var a in ViewBag.Categories)
+                {
+                    <option value="@a.Id">@a.Name</option>
+                }
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Изменить вакансию</button>
+    </form>
+</div>

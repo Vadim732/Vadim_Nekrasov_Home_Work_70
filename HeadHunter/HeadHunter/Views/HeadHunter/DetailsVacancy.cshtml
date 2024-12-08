@@ -1,0 +1,15 @@
+@model Vacancy
+
+@{
+    ViewBag.Title = "Детальная страница вакансии";
+}
+
+<div class="container">
+    <p>@Model.Title</p>
+    <p>@Model.Salary</p>
+    <p>@Model.Description</p>
+    <p>@Model.ExperienceRequiredFrom</p>
+    <p>@Model.ExperienceRequiredTo</p>
+    <p>@Model.UpdatedAt</p>
+    <p>@Model.CategoryId</p>
+</div>
