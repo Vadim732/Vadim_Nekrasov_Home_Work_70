@@ -20,16 +20,13 @@
             </button>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item ml-2">
-                        @* <a class="btn btn-outline-light" asp-controller="" asp-action=""><i class="fa-solid fa-plus"></i>  Создать</a> *@
-                    </li>
                     @if (User.IsInRole("admin"))
                     {
-                        <li class="nav-item me-3">
-                            <a class="btn btn-light nav-link text-dark" href="@Url.Action("CreateCategory", "HeadHunter")">Создать новую категорию</a>
+                        <li class="nav-item me-3 ml-2">
+                            <a class="btn btn-outline-danger text-white" href="@Url.Action("CreateCategory", "HeadHunter")"><i class="fa-solid fa-plus me-1"></i> Создать новую категорию</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-light nav-link text-dark" href="@Url.Action("IndexCategories", "HeadHunter")">Все категории</a>
+                            <a class="btn btn-outline-danger text-white" href="@Url.Action("IndexCategories", "HeadHunter")"><i class="fa-solid fa-list-ul me-1"></i> Все категории</a>
                         </li>
                     }
                 </ul>
