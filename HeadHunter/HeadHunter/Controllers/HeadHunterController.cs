@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Controllers;
 
@@ -50,11 +51,11 @@ public class HeadHunterController : Controller
     }
     [HttpPost]
     [Authorize(Roles = "employer")]
-    public IActionResult CreateVacancy(Vacancy vacancy)
+    public async Task<IActionResult> CreateVacancy(Vacancy vacancy)
     {
         if (ModelState.IsValid)
         {
-            var creator = _userManager.GetUserAsync(User);
+            var creator = await _userManager.GetUserAsync(User);
             vacancy.UpdatedAt = DateTime.UtcNow;
             vacancy.EmployerId = creator.Id;
             _context.Vacancies.Add(vacancy);
@@ -72,11 +73,11 @@ public class HeadHunterController : Controller
     }
     [HttpPost]
     [Authorize(Roles = "applicant")]
-    public IActionResult CreateResume(Resume resume)
+    public async Task<IActionResult> CreateResume(Resume resume)
     {
         if (ModelState.IsValid)
         {
-            var creator = _userManager.GetUserAsync(User);
+            var creator = await _userManager.GetUserAsync(User);
             resume.LastUpdated = DateTime.UtcNow;
             resume.UserId = creator.Id;
             _context.Resumes.Add(resume);
