@@ -1,0 +1,56 @@
+﻿@model IEnumerable<HeadHunter.Models.Vacancy>
+
+@{
+    ViewBag.Title = "Отклики на вакансии";
+    var responses = ViewBag.Responses as List<HeadHunter.Models.Resume>;
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning"><i class="fa-regular fa-file-excel"></i> У вас ещё нет созданных вакансий :с</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var vacancy in Model)
+        {
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body bg-dark text-white">
+                        <h5 class="card-title"><i class="fa-solid fa-file-lines HHL"></i> @vacancy.Title</h5>
+                        <p class="card-text">Обновлено: @vacancy.UpdatedAt.ToString("dd.MM.yyyy")</p>
+                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#responseModal-@vacancy.Id">
+                            <i class="fa-solid fa-check-to-slot"></i> Отклики
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="responseModal-@vacancy.Id" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark">
+                            <h5 class="modal-title text-white"><i class="fa-regular fa-file-lines HHL"></i> Отклики на вакансию: <span class="HHL">@vacancy.Title</span></h5>
+                        </div>
+                        <div class="modal-body">
+                            @if (responses.Any(r => r.CategoryId == vacancy.CategoryId))
+                            {
+                                @foreach (var response in responses.Where(r => r.CategoryId == vacancy.CategoryId))
+                                {
+                                    <div class="mb-1">
+                                        <h6><i class="fa-solid fa-user HHL"></i> @response.User.UserName <h1 class="text-error">(здесь будет ссылка на страницу профиля пользователя)</h1></h6>
+                                        <p><i class="fa-solid fa-address-book HHL"></i> Резюме: @response.Title <h1 class="text-error">(здесь будет ссылка на страницу детального просмотра)</h1></p>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-error">Откликов на эту вакансию к сожалению ещё нет :с</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

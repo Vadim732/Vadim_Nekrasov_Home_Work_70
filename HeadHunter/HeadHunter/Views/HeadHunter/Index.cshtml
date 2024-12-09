@@ -16,17 +16,20 @@
         <div class="row row-cols-1 g-3">
             @foreach (var v in Model)
             {
-                <div class="col">
+                <div class="col mb-2">
                     <div class="card shadow-sm">
                         <a href="@Url.Action("DetailsVacancy", "HeadHunter", new { id = v.Id })" class="card-body text-decoration-none">
                             <h5 class="card-title">@v.Title</h5>
                             <p class="card-text text-muted">Обновлено: @v.UpdatedAt</p>
                         </a>
-                        <div class="card-footer d-flex justify-content-end">
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#responseModal-@v.Id">
-                                Откликнуться
-                            </button>
-                        </div>
+                        @if (User.IsInRole("applicant"))
+                        {
+                            <div class="card-footer d-flex justify-content-end">
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#responseModal-@v.Id">
+                                    Откликнуться
+                                </button>
+                            </div>
+                        }
                     </div>
                 </div>
                 

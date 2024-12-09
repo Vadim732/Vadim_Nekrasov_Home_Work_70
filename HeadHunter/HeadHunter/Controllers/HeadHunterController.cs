@@ -248,9 +248,31 @@ public class HeadHunterController : Controller
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");
     }
-    // Отклик на вакансию
-    public IActionResult SendResponse()
+
+    [Authorize (Roles = "employer")]
+    public async Task<IActionResult> SendResponse()
     {
+        User user = await _userManager.GetUserAsync(User);
+        if (User != null)
+        {
+            var employerVacancies = await _context.Vacancies
+                .Where(v => v.EmployerId == user.Id)
+                .Include(v => v.Category)
+                .Include(v => v.Employer)
+                .ToListAsync();
+            ViewBag.Vacancies = employerVacancies;
+            
+            var responses = await _context.Resumes
+                .Where(r => employerVacancies.Select(v => v.Id).Contains(r.CategoryId))
+                .Include(r => r.User)
+                .ToListAsync();
+
+            ViewBag.Vacancies = employerVacancies;
+            ViewBag.Responses = responses;
+
+            return View(employerVacancies);
+        }
+        
         return RedirectToAction("Index");
     }
 }
