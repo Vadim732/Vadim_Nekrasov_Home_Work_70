@@ -204,6 +204,10 @@ public class HeadHunterController : Controller
     public IActionResult PublicationVacancy(int id)
     {
         var vacancy = _context.Vacancies.FirstOrDefault(v => v.Id == id);
+        if (vacancy == null)
+        {
+            return NotFound("Такая вакансия не найдена");
+        }
         if (vacancy.IsPublished == true)
         {
             return NotFound("Эта вакансия уже опубликована");
@@ -212,5 +216,31 @@ public class HeadHunterController : Controller
         _context.Update(vacancy);
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");  
+    }
+
+    public IActionResult UpdateVacancy(int id)
+    {
+        var vacancy = _context.Vacancies.FirstOrDefault(v => v.Id == id);
+        if (vacancy == null)
+        {
+            return NotFound("Такая вакансия не найдена");
+        }
+        vacancy.UpdatedAt = DateTime.UtcNow;
+        _context.Update(vacancy);
+        _context.SaveChanges();
+        return RedirectToAction("Profile", "Account");
+    }
+
+    public IActionResult UpdateResume(int id)
+    {
+        var resume = _context.Resumes.FirstOrDefault(r => r.Id == id);
+        if (resume == null)
+        {
+            return NotFound("Такое резюме не найдено");
+        }
+        resume.LastUpdated = DateTime.UtcNow;
+        _context.Update(resume);
+        _context.SaveChanges();
+        return RedirectToAction("Profile", "Account");
     }
 }

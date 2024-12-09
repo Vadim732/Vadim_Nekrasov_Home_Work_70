@@ -60,10 +60,11 @@
             <ul>
                 @foreach (var vacancy in ViewBag.Vacancies)
                 {
-                    <li>@vacancy.Title - @vacancy.Description</li>
+                    <li>@vacancy.Title - @vacancy.Description - @vacancy.UpdatedAt</li>
                     <a asp-action="EditVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">редактировать</a>
                     <a asp-action="DetailsVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">детальная страница</a>
                     <a asp-action="PublicationVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">опубликовать</a>
+                    <a asp-action="UpdateVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">обновить</a>
                 }
             </ul>
         }
@@ -83,8 +84,9 @@
             <ul>
                 @foreach (var resume in ViewBag.Resumes)
                 {
-                    <li>@resume.Title - @resume.Telegram</li>
+                    <li>@resume.Title - @resume.Telegram - @resume.LastUpdated</li>
                     <a asp-action="EditResume" asp-route-id="@resume.Id" asp-controller="HeadHunter">редактировать</a>
+                    <a asp-action="UpdateResume" asp-route-id="@resume.Id" asp-controller="HeadHunter">обновить</a>
                 }
             </ul>
         }
