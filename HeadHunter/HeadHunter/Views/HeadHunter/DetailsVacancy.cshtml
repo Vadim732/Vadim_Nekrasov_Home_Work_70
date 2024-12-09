@@ -4,12 +4,30 @@
     ViewBag.Title = "Детальная страница вакансии";
 }
 
-<div class="container">
-    <p>@Model.Title</p>
-    <p>@Model.Salary</p>
-    <p>@Model.Description</p>
-    <p>@Model.ExperienceRequiredFrom</p>
-    <p>@Model.ExperienceRequiredTo</p>
-    <p>@Model.UpdatedAt</p>
-    <p>@Model.CategoryId</p>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title">@Model.Title</h1>
+            <div class="d-flex justify-content-between mb-3">
+                <span class="badge bg-info">@Model.Category.Name</span>
+                <span class="text-muted">@Model.UpdatedAt.ToString("dd.MM.yyyy")</span>
+            </div>
+            
+            <h5 class="card-subtitle mb-2 text-muted">Зарплата</h5>
+            <p class="card-text">@Model.Salary</p>
+
+            <h5 class="card-subtitle mb-2 text-muted">Описание вакансии</h5>
+            <p class="card-text">@Model.Description</p>
+
+            <h5 class="card-subtitle mb-2 text-muted">Требуемый опыт</h5>
+            <p class="card-text">
+                От: @Model.ExperienceRequiredFrom лет<br/>
+                До: @Model.ExperienceRequiredTo лет
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "HeadHunter")" class="btn btn-outline-secondary">Назад к вакансиям</a>
+    </div>
 </div>

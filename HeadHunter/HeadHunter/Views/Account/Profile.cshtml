@@ -57,16 +57,24 @@
         <h3>Вакансии</h3>
         @if (ViewBag.Vacancies != null && ViewBag.Vacancies.Count > 0)
         {
-            <ul>
+            <div class="row row-cols-1 g-3">
                 @foreach (var vacancy in ViewBag.Vacancies)
                 {
-                    <li>@vacancy.Title - @vacancy.Description - @vacancy.UpdatedAt</li>
-                    <a asp-action="EditVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">редактировать</a>
-                    <a asp-action="DetailsVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">детальная страница</a>
-                    <a asp-action="PublicationVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">опубликовать</a>
-                    <a asp-action="UpdateVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter">обновить</a>
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">@vacancy.Title</h5>
+                                <p class="card-text text-muted">Обновлено: @vacancy.UpdatedAt</p>
+                                <div class="d-flex justify-content-end">
+                                    <a asp-action="EditVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-primary btn-sm me-2">Редактировать</a>
+                                    <a asp-action="PublicationVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-warning btn-sm me-2">Опубликовать</a>
+                                    <a asp-action="UpdateVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-success btn-sm">Обновить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </ul>
+            </div>
         }
         else
         {
@@ -81,14 +89,23 @@
         <h3>Резюме</h3>
         @if (ViewBag.Resumes != null && ViewBag.Resumes.Count > 0)
         {
-            <ul>
+            <div class="row row-cols-1 g-3">
                 @foreach (var resume in ViewBag.Resumes)
                 {
-                    <li>@resume.Title - @resume.Telegram - @resume.LastUpdated</li>
-                    <a asp-action="EditResume" asp-route-id="@resume.Id" asp-controller="HeadHunter">редактировать</a>
-                    <a asp-action="UpdateResume" asp-route-id="@resume.Id" asp-controller="HeadHunter">обновить</a>
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">@resume.Title</h5>
+                                <p class="card-text text-muted">Обновлено: @resume.LastUpdated</p>
+                                <div class="d-flex justify-content-end">
+                                    <a asp-action="EditResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-primary btn-sm me-2">Редактировать</a>
+                                    <a asp-action="UpdateResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-success btn-sm">Обновить</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </ul>
+            </div>
         }
         else
         {
