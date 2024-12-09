@@ -16,9 +16,14 @@ public class HeadHunterController : Controller
         _userManager = userManager;
         _context = context;
     }
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         List<Vacancy> vacancies = _context.Vacancies.Where(v => v.IsPublished == true).ToList();
+        if (User.IsInRole("applicant"))
+        {
+            var user = await _userManager.GetUserAsync(User);
+            ViewBag.Resumes = _context.Resumes.Where(a => a.UserId == user.Id).ToList();
+        }
         return View(vacancies);
     }
     [Authorize(Roles = "admin")]
@@ -242,5 +247,10 @@ public class HeadHunterController : Controller
         _context.Update(resume);
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");
+    }
+    // Отклик на вакансию
+    public IActionResult SendResponse()
+    {
+        return RedirectToAction("Index");
     }
 }
