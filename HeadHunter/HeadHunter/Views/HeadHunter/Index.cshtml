@@ -1,1 +1,12 @@
-﻿<h2>title</h2>
+﻿@model List<Vacancy>
+
+@{
+    ViewBag.Title = "Все доступные вакансии";
+}
+
+<div class="container">
+    @foreach (var v in Model)
+    {
+        <p>@v.Title</p>
+    }
+</div>

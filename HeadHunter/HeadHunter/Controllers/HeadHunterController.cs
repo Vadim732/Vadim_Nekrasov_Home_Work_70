@@ -18,7 +18,8 @@ public class HeadHunterController : Controller
     }
     public IActionResult Index()
     {
-        return View();
+        List<Vacancy> vacancies = _context.Vacancies.Where(v => v.IsPublished == true).ToList();
+        return View(vacancies);
     }
     [Authorize(Roles = "admin")]
     public IActionResult CreateCategory()
@@ -199,5 +200,17 @@ public class HeadHunterController : Controller
             return NotFound("Такая вакансия не найдена");
         }
         return View(vacancy);
+    }
+    public IActionResult PublicationVacancy(int id)
+    {
+        var vacancy = _context.Vacancies.FirstOrDefault(v => v.Id == id);
+        if (vacancy.IsPublished == true)
+        {
+            return NotFound("Эта вакансия уже опубликована");
+        }
+        vacancy.IsPublished = true;
+        _context.Update(vacancy);
+        _context.SaveChanges();
+        return RedirectToAction("Profile", "Account");  
     }
 }
