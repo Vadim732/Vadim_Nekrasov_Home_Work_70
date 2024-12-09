@@ -83,6 +83,7 @@
                 @foreach (var resume in ViewBag.Resumes)
                 {
                     <li>@resume.Title - @resume.Telegram</li>
+                    <a asp-action="EditResume" asp-route-id="@resume.Id" asp-controller="HeadHunter">редактировать</a>
                 }
             </ul>
         }

@@ -4,50 +4,56 @@
     ViewBag.Title = "Редактирование вакансии";
 }
 
-<div class="container mt-4">
-    <h1 class="text-center">Редактирование вакансии</h1>
-    <form asp-action="EditVacancy" asp-controller="HeadHunter" method="post" class="mt-4">
-        <div class="mb-3">
-            <label for="Title" class="form-label">Название вакансии</label>
-            <input asp-for="Title" class="form-control" id="Title" placeholder="Введите название вакансии" />
-            <span asp-validation-for="Title" class="text-danger"></span>
+<div class="bg-dark text-center pt-5 pb-4 border-radius-1">
+    <h3 class="text-white mb-5"><i class="fa-solid fa-file-lines"></i> Заполните форму для редактирования вакансии</h3>
+    <form asp-action="EditVacancy" asp-controller="HeadHunter" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-error"></div>
+        <div class="form_row mb-3">
+            <label for="Title" class="col-4">
+                <input asp-for="Title" class="form-control" id="Title" placeholder="Введите название резюме" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </label>
         </div>
-
-        <div class="mb-3">
-            <label for="Salary" class="form-label">Зарплата</label>
-            <input asp-for="Salary" class="form-control" id="Salary" placeholder="Укажите зарплату" />
-            <span asp-validation-for="Salary" class="text-danger"></span>
+        <div class="form_row mb-3">
+            <label for="Salary" class="col-4">
+                <input asp-for="Salary" class="form-control" id="Salary" placeholder="Укажите зарплату" />
+                <span asp-validation-for="Salary" class="text-danger"></span>
+            </label>
         </div>
-
-        <div class="mb-3">
-            <label for="Description" class="form-label">Описание вакансии</label>
-            <textarea asp-for="Description" class="form-control" id="Description" rows="5" placeholder="Опишите вакансию"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
+        <div class="form_row mb-3">
+            <label for="Description" class="col-4">
+                <textarea asp-for="Description" class="form-control" id="Description" placeholder="Опишите вакансию"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </label>
         </div>
-
-        <div class="mb-3">
-            <label for="ExperienceRequiredFrom" class="form-label">Опыт работы (от, лет)</label>
-            <input asp-for="ExperienceRequiredFrom" class="form-control" id="ExperienceRequiredFrom" placeholder="Минимальный опыт работы" />
-            <span asp-validation-for="ExperienceRequiredFrom" class="text-danger"></span>
+        <div class="form_row mb-3">
+            <label for="ExperienceRequiredFrom" class="col-4">
+                <input asp-for="ExperienceRequiredFrom" class="form-control" id="ExperienceRequiredFrom" placeholder="Минимальный опыт работы" />
+                <span asp-validation-for="ExperienceRequiredFrom" class="text-danger"></span>
+            </label>
         </div>
-
-        <div class="mb-3">
-            <label for="ExperienceRequiredTo" class="form-label">Опыт работы (до, лет)</label>
-            <input asp-for="ExperienceRequiredTo" class="form-control" id="ExperienceRequiredTo" placeholder="Максимальный опыт работы" />
-            <span asp-validation-for="ExperienceRequiredTo" class="text-danger"></span>
+        <div class="form_row mb-3">
+            <label for="ExperienceRequiredTo" class="col-4">
+                <input asp-for="ExperienceRequiredTo" class="form-control" id="ExperienceRequiredTo" placeholder="Максимальный опыт работы" />
+                <span asp-validation-for="ExperienceRequiredTo" class="text-danger"></span>
+            </label>
         </div>
-
-        <div class="mb-3">
-            <label for="CategoryId" class="form-label">Категория</label>
-            <select asp-for="CategoryId" class="form-select">
-                <option value="">Выберите категорию</option>
-                @foreach (var a in ViewBag.Categories)
-                {
-                    <option value="@a.Id">@a.Name</option>
-                }
-            </select>
-            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        <div class="form_row mb-3">
+            <label for="CategoryId" class="col-4">
+                <select asp-for="CategoryId" class="form-select">
+                    <option value="">Выберите категорию</option>
+                    @foreach (var a in ViewBag.Categories)
+                    {
+                        <option value="@a.Id">@a.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </label>
         </div>
-        <button type="submit" class="btn btn-primary">Изменить вакансию</button>
+        <button type="submit" class="btn btn-outline-light mb-3 w-25">Изменить вакансию</button>
     </form>
 </div>
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
