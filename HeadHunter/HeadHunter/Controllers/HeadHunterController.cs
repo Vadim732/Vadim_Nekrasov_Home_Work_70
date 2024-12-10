@@ -1,4 +1,5 @@
 ﻿using HeadHunter.Models;
+using HeadHunter.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +19,29 @@ public class HeadHunterController : Controller
     }
     public async Task<IActionResult> Index()
     {
-        List<Vacancy> vacancies = _context.Vacancies.Where(v => v.IsPublished == true).ToList();
+        var vacancies = await _context.Vacancies.Where(v => v.IsPublished).ToListAsync();
+        var resumes = await _context.Resumes.Where(r => r.IsPublished).ToListAsync();
+        var user = await _userManager.GetUserAsync(User);
+        
         if (User.IsInRole("applicant"))
         {
-            var user = await _userManager.GetUserAsync(User);
-            ViewBag.Resumes = _context.Resumes.Where(a => a.UserId == user.Id).ToList();
+            ViewBag.Resumes = _context.Resumes.Where(r => r.UserId == user.Id).ToList();
         }
-        return View(vacancies);
+        
+        if (User.IsInRole("employer"))
+        {
+            ViewBag.Vacancies = _context.Vacancies.Where(v => v.EmployerId == user.Id).ToList();
+        }
+
+        var model = new IndexViewModel
+        {
+            Vacancies = vacancies,
+            Resumes = resumes
+        };
+
+        return View(model);
     }
+
     [Authorize(Roles = "admin")]
     public IActionResult CreateCategory()
     {
