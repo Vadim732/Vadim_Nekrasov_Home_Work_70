@@ -41,11 +41,12 @@
                 @if (User.IsInRole("employer"))
                 {
                     <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateVacancy"><i class="fa-solid fa-file-circle-plus HHL"></i> Создать Вакансию</a>
-                    <a class="btn btn-outline-dark ml-1" asp-controller="HeadHunter" asp-action="SendResponse"><i class="fa-regular fa-envelope text-success"></i> Отклики</a>
+                    <a class="btn btn-outline-dark ml-1" asp-controller="HeadHunter" asp-action="AllResponsesVacancies"><i class="fa-regular fa-envelope text-success"></i> Отклики</a>
                 }
                 @if (User.IsInRole("applicant"))
                 {
                     <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateResume">Создать Резюме</a>
+                    <a class="btn btn-outline-dark ml-1" asp-controller="HeadHunter" asp-action="MyFeedback"><i class="fa-regular fa-envelope text-success"></i>Мои Отклики</a>
                 }
             </div>
         </div>

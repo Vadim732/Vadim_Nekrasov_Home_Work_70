@@ -49,7 +49,8 @@ public class HeadHunterController : Controller
     {
         return View(_context.Categories.ToList());
     }
-
+    
+    [Authorize(Roles = "employer")]
     public IActionResult CreateVacancy()
     {
         ViewBag.Categories = _context.Categories.ToList();
@@ -71,7 +72,8 @@ public class HeadHunterController : Controller
         ViewBag.Categories = _context.Categories.ToList();
         return View(vacancy);
     }
-
+    
+    [Authorize(Roles = "applicant")]
     public IActionResult CreateResume()
     {
         ViewBag.Categories = _context.Categories.ToList();
@@ -187,7 +189,7 @@ public class HeadHunterController : Controller
         existingResume.CategoryId = resume.CategoryId;
         existingResume.Telegram = resume.Telegram;
         existingResume.ExpectedSalary = resume.ExpectedSalary;
-        existingResume.LastUpdated = resume.LastUpdated;
+        existingResume.LastUpdated = DateTime.UtcNow;
         existingResume.LinkedInLink = resume.LinkedInLink;
         existingResume.FacebookLink = resume.FacebookLink;
         _context.Resumes.Update(existingResume);
@@ -206,6 +208,7 @@ public class HeadHunterController : Controller
         }
         return View(vacancy);
     }
+    [Authorize(Roles = "employer")]
     public IActionResult PublicationVacancy(int id)
     {
         var vacancy = _context.Vacancies.FirstOrDefault(v => v.Id == id);
@@ -222,7 +225,8 @@ public class HeadHunterController : Controller
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");  
     }
-
+    
+    [Authorize(Roles = "employer")]
     public IActionResult UpdateVacancy(int id)
     {
         var vacancy = _context.Vacancies.FirstOrDefault(v => v.Id == id);
@@ -235,7 +239,8 @@ public class HeadHunterController : Controller
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");
     }
-
+    
+    [Authorize(Roles = "applicant")]
     public IActionResult UpdateResume(int id)
     {
         var resume = _context.Resumes.FirstOrDefault(r => r.Id == id);
@@ -249,8 +254,20 @@ public class HeadHunterController : Controller
         return RedirectToAction("Profile", "Account");
     }
 
-    [Authorize (Roles = "employer")]
+    [Authorize (Roles = "applicant")]
     public async Task<IActionResult> SendResponse()
+    {
+        return RedirectToAction("Index");
+    }
+    
+    [Authorize(Roles = "applicant")]
+    public async Task<IActionResult> MyFeedback() // Метод для показа всех откликов соискателя вместе с отправленными резюме
+    {
+        return RedirectToAction("Profile", "Account");
+    }
+    
+    [Authorize(Roles = "employer")]
+    public async Task<IActionResult> AllResponsesVacancies()
     {
         User user = await _userManager.GetUserAsync(User);
         if (User != null)
@@ -272,7 +289,6 @@ public class HeadHunterController : Controller
 
             return View(employerVacancies);
         }
-        
         return RedirectToAction("Index");
     }
 }

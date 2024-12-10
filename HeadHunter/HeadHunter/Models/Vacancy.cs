@@ -10,7 +10,7 @@ public class Vacancy
     public string Title { get; set; }
     
     [Required(ErrorMessage = "Введите заработную плату")]
-    public decimal Salary { get; set; }
+    public int Salary { get; set; }
     
     [Required(ErrorMessage = "Введите описание")]
     public string Description { get; set; }

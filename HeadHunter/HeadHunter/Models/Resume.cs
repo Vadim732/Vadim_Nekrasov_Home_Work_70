@@ -9,7 +9,7 @@ public class Resume
     public string Title { get; set; }
     public DateTime LastUpdated { get; set; }
     [Required(ErrorMessage = "Введите ожидаемую зарплату")]
-    public decimal ExpectedSalary { get; set; }
+    public int ExpectedSalary { get; set; }
     [Required(ErrorMessage = "Введите ссылку на телеграм")]
     public string Telegram { get; set; }
     [Required(ErrorMessage = "Введите почту")]
