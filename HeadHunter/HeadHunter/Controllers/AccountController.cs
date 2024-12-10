@@ -451,7 +451,10 @@ public class AccountController : Controller
         return Json(new { success = false, message = "Некорректные данные." });
     }
 
-
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
 
     public async Task<IActionResult> Logout()
     {

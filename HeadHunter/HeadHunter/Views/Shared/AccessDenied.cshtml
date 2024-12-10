@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Доступ запрещен";
+}
+
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="text-center shadow p-5 rounded bg-white" style="max-width: 500px;">
+        <h1 class="display-4 text-danger mb-4"><i class="bi bi-shield-lock-fill"></i>Доступ запрещён</h1>
+        <p class="lead text-muted mb-4">К сожалению, у вас недостаточно прав для доступа.</p>
+        <a href="@Url.Action("Profile", "Account")" class="btn btn-primary btn-lg">Вернуться в профиль.</a>
+    </div>
+</div>
