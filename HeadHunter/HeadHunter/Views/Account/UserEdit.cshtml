@@ -3,7 +3,9 @@
 @{
     ViewBag.Title = "Редактирование пользователя";
 }
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" 
+integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" 
+referrerpolicy="no-referrer"></script>
 <div class="bg-dark text-center pt-5 pb-4 border-radius-1">
     <h3 class="text-white mb-5">Заполните форму для редактирования пользователя</h3>
     <form asp-action="UserEdit" asp-controller="Account" asp-anti-forgery="true">
@@ -43,4 +45,33 @@
 
 @section Scripts{
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('form').submit(function (e) {
+                e.preventDefault();  
+
+                var form = $(this);
+                var formData = form.serialize();  
+
+                $.ajax({
+                    url: '@Url.Action("UserEdit", "Account")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Произошла ошибка при отправке данных.');
+                    }
+                });
+            });
+        });
+    </script>
 }

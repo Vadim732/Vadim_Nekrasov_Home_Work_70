@@ -3,10 +3,12 @@
 @{
     ViewBag.Title = "Edit Profile";
 }
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
 <div class="bg-dark text-center pt-5 pb-4 border-radius-1">
     <h3 class="text-white mb-5">Заполните форму для редактирования аккаунта</h3>
-    <form asp-action="Edit" asp-controller="Account" asp-anti-forgery="true">
+    <form asp-action="UserEdit" asp-controller="Account" asp-anti-forgery="true">
         <div asp-validation-summary="ModelOnly" class="text-error"></div>
         <div class="form_row mb-3">
             <label for="" class="col-4">
@@ -54,4 +56,45 @@
 
 @section Scripts{
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            $('form').submit(function (e) {
+                e.preventDefault();  
+
+                var form = $(this);
+                var formData = form.serialize();  
+                console.log("Данные формы: ", formData);  
+
+                $.ajax({
+                    url: '@Url.Action("UserEdit", "Account")',  
+                    type: 'POST',
+                    data: formData,  
+                    beforeSend: function () {
+                        console.log("Отправка запроса на сервер...");
+                    },
+                    success: function (response) {
+                        console.log("Ответ от сервера: ", response);  
+                        if (response.success) {
+                            alert(response.message);  
+                        } else {
+                            alert(response.message);  
+                        }
+                        
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Ошибка при запросе: ", xhr, status, error);  
+                        alert('Произошла ошибка при отправке данных.');
+                    },
+                    complete: function () {
+                        console.log("Запрос завершён.");
+                        window.location.replace("https://localhost:7120/Account/Profile")
+                    }
+                });
+            });
+        });
+    </script>
+
+
 }
+

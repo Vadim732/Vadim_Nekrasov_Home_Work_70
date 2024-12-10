@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Delivery.Controllers;
@@ -13,12 +14,14 @@ public class AccountController : Controller
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly HeadHunterContext _context;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, HeadHunterContext context)
+    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, HeadHunterContext context, ILogger<AccountController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _context = context;
+        _logger = logger;
     }
     
     [Authorize]
@@ -362,58 +365,94 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Account");
     }
     
-    [Authorize(Roles = "admin")]
-    [HttpGet]
-    public async Task<IActionResult> UserEdit(int userId)
-    {
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-        var model = new UserEditViewModel
-        {
-            UserName = user.UserName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
-            Avatar = user.Avatar
-        };
+    //[Authorize(Roles = "admin")]
+    //[HttpGet]
+    //public async Task<IActionResult> UserEdit(int userId)
+    //{
+    //    var user = await _userManager.FindByIdAsync(userId.ToString());
+    //    var model = new UserEditViewModel
+    //    {
+    //        UserName = user.UserName,
+    //        Email = user.Email,
+    //        PhoneNumber = user.PhoneNumber,
+    //        Avatar = user.Avatar
+    //    };
 
-        return View(model);
-    }
+    //    return View(model);
+    //}
     
-    [Authorize(Roles = "admin")]
     [HttpPost]
-    public async Task<IActionResult> UserEdit(int userId, UserEditViewModel uevm)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UserEdit(EditViewModel model)
     {
         if (ModelState.IsValid)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            
-            var existingEmailUser = await _userManager.FindByEmailAsync(uevm.Email);
-            if (existingEmailUser != null && existingEmailUser.Id != user.Id)
+            User user = await _userManager.GetUserAsync(User);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (roles.Contains("admin"))
             {
-                ViewBag.ErrorMessage = "Этот адрес электронной почты уже используется другим пользователем!";
-                return View(uevm);
+                return Json(new { success = false, message = "Вы не можете редактировать данные как администратор." });
             }
 
-            var existingUserNameUser = await _userManager.FindByNameAsync(uevm.UserName);
-            if (existingUserNameUser != null && existingUserNameUser.Id != user.Id)
+            if (user != null)
             {
-                ViewBag.ErrorMessage = "Этот логин уже используется другим пользователем!";
-                return View(uevm);
-            }
+                var existingUserEmail = await _userManager.FindByEmailAsync(model.Email);
+                if (existingUserEmail != null && existingUserEmail.Id != user.Id)
+                {
+                    return Json(new { success = false, message = "Ошибка: Этот адрес электронной почты уже используется другим пользователем!" });
+                }
 
-            user.UserName = uevm.UserName;
-            user.Email = uevm.Email;
-            user.Avatar = uevm.Avatar;
-            user.PhoneNumber = uevm.PhoneNumber;
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
+                var existingUserName = await _userManager.FindByNameAsync(model.UserName);
+                if (existingUserName != null && existingUserName.Id != user.Id)
+                {
+                    return Json(new { success = false, message = "Ошибка: Этот логин уже используется другим пользователем!" });
+                }
+
+                var currentDate = DateTime.Now;
+                var userAge = currentDate.Year - model.DateOfBirth.Year;
+                if (model.DateOfBirth > currentDate.AddYears(-userAge))
+                {
+                    userAge--;
+                }
+                if (userAge < 18)
+                {
+                    return Json(new { success = false, message = "Ошибка: Нельзя зарегистрироваться пользователям моложе 18 лет!" });
+                }
+
+                user.UserName = model.UserName;
+                user.Email = model.Email;
+                user.Avatar = model.Avatar;
+                user.PhoneNumber = model.PhoneNumber;
+                user.DateOfBirth = DateTime.SpecifyKind(model.DateOfBirth, DateTimeKind.Utc);
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return Json(new { success = true, message = "Данные успешно обновлены!" });
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    return Json(new { success = false, message = "Произошла ошибка при обновлении данных пользователя." });
+                }
+            }
+            else
             {
-                return RedirectToAction("Index", "Account");
+                return Json(new { success = false, message = "Пользователь не найден." });
             }
         }
 
-        return View(uevm);
+        return Json(new { success = false, message = "Некорректные данные." });
     }
-    
+
+
+
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
