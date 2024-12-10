@@ -225,6 +225,25 @@ public class HeadHunterController : Controller
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");  
     }
+
+    [Authorize(Roles = "applicant")]
+    public IActionResult PublicationResume(int id)
+    {
+        var resume = _context.Resumes.FirstOrDefault(r => r.Id == id);
+        if (resume == null)
+        {
+            return NotFound("Такое резюме не найдено");
+        }
+
+        if (resume.IsPublished == true)
+        {
+            return NotFound("Это резюме уже опубликовано");
+        }
+        resume.IsPublished = true;
+        _context.Update(resume);
+        _context.SaveChanges();
+        return RedirectToAction("Profile", "Account");
+    }
     
     [Authorize(Roles = "employer")]
     public IActionResult UpdateVacancy(int id)

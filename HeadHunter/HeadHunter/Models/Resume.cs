@@ -18,6 +18,9 @@ public class Resume
     public string PhoneNumber { get; set; }
     public string? FacebookLink { get; set; }
     public string? LinkedInLink { get; set; }
+    
+    public bool IsPublished { get; set; }
+    
     [Required(ErrorMessage = "Выберите категорию")]
     public int CategoryId { get; set; }
     public Category? Category { get; set; }
