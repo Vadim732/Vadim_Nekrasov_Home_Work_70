@@ -1,0 +1,27 @@
+@model List<Response>
+
+@{
+    ViewBag.Title = "Мои отклики";
+}
+
+<div class="container">
+    <div class="row">
+        @foreach (var response in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">@response.Vacancy.Title</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Резюме: @response.Resume.Title</h6>
+                        <p class="card-text">Ожидаемая зарплата: @response.Resume.ExpectedSalary.ToString("C")</p>
+                        <p class="card-text">Телефон: @response.Resume.PhoneNumber</p>
+                        <p class="card-text">Телеграм: @response.Resume.Telegram</p>
+                        <p class="card-text">Дата отправки отклика: @response.SentAt.ToString("g")</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

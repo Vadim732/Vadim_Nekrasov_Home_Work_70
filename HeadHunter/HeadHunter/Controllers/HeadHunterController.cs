@@ -254,23 +254,58 @@ public class HeadHunterController : Controller
         return RedirectToAction("Profile", "Account");
     }
 
-    [Authorize (Roles = "applicant")]
-    public async Task<IActionResult> SendResponse()
+    [Authorize(Roles = "applicant")]
+    [HttpPost]
+    public async Task<IActionResult> SendResponse(int vacancyId, int resumeId)
     {
-        return RedirectToAction("Index");
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+        var vacancy = await _context.Vacancies.FindAsync(vacancyId);
+        var resume = await _context.Resumes.FindAsync(resumeId);
+
+        if (vacancy == null || resume == null || resume.UserId != user.Id)
+        {
+            return NotFound("Вакансия или резюме не найдены, либо вы пытаетесь использовать чужое резюме.");
+        }
+        var response = new Response
+        {
+            ResumeId = resumeId,
+            VacancyId = vacancyId,
+            SentAt = DateTime.UtcNow,
+            ApplicantId = user.Id
+        };
+        _context.Responses.Add(response);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("MyFeedback");
     }
     
     [Authorize(Roles = "applicant")]
-    public async Task<IActionResult> MyFeedback() // Метод для показа всех откликов соискателя вместе с отправленными резюме
+    public async Task<IActionResult> MyFeedback()
     {
-        return RedirectToAction("Profile", "Account");
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+        var responses = await _context.Responses
+            .Include(r => r.Resume)
+            .Include(r => r.Vacancy)
+            .Where(r => r.ApplicantId == user.Id)
+            .ToListAsync();
+        return View(responses);
     }
+
     
     [Authorize(Roles = "employer")]
     public async Task<IActionResult> AllResponsesVacancies()
     {
         User user = await _userManager.GetUserAsync(User);
-        if (User != null)
+        if (user != null)
         {
             var employerVacancies = await _context.Vacancies
                 .Where(v => v.EmployerId == user.Id)
@@ -279,12 +314,12 @@ public class HeadHunterController : Controller
                 .ToListAsync();
             ViewBag.Vacancies = employerVacancies;
             
-            var responses = await _context.Resumes
-                .Where(r => employerVacancies.Select(v => v.Id).Contains(r.CategoryId))
-                .Include(r => r.User)
+            var responses = await _context.Responses
+                .Where(r => employerVacancies.Select(v => v.Id).Contains(r.VacancyId))
+                .Include(r => r.Resume)
+                .ThenInclude(res => res.User)
                 .ToListAsync();
 
-            ViewBag.Vacancies = employerVacancies;
             ViewBag.Responses = responses;
 
             return View(employerVacancies);

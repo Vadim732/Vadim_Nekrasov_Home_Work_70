@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Отклики на вакансии";
-    var responses = ViewBag.Responses as List<Resume>;
+    var responses = ViewBag.Responses as List<Response>;
 }
 
 @if (!Model.Any())
@@ -33,13 +33,13 @@ else
                             <h5 class="modal-title text-white"><i class="fa-regular fa-file-lines HHL"></i> Отклики на вакансию: <span class="HHL">@vacancy.Title</span></h5>
                         </div>
                         <div class="modal-body">
-                            @if (responses.Any(r => r.CategoryId == vacancy.CategoryId))
+                            @if (responses.Any(r => r.VacancyId == vacancy.Id))
                             {
-                                @foreach (var response in responses.Where(r => r.CategoryId == vacancy.CategoryId))
+                                @foreach (var response in responses.Where(r => r.VacancyId == vacancy.Id))
                                 {
                                     <div class="mb-1">
-                                        <h6><i class="fa-solid fa-user HHL"></i> @response.User.UserName <h1 class="text-error">(здесь будет ссылка на страницу профиля пользователя)</h1></h6>
-                                        <p><i class="fa-solid fa-address-book HHL"></i> Резюме: @response.Title <h1 class="text-error">(здесь будет ссылка на страницу детального просмотра)</h1></p>
+                                        <h6><i class="fa-solid fa-user HHL"></i> @response.Resume.User.UserName</h6>
+                                        <p><i class="fa-solid fa-address-book HHL"></i> Резюме: @response.Resume.Title</p>
                                     </div>
                                 }
                             }

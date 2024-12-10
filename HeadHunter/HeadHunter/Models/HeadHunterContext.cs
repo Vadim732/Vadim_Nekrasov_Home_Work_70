@@ -12,6 +12,7 @@ public class HeadHunterContext : IdentityDbContext<User, IdentityRole<int>, int>
     public DbSet<Vacancy> Vacancies { get; set; }
     public DbSet<WorkExperience> WorkExperiences { get; set; }
     public DbSet<EducationOrCourse> EducationOrCourses { get; set; }
+    public DbSet<Response> Responses { get; set; }
     
     public HeadHunterContext(DbContextOptions<HeadHunterContext> options) : base(options) {}
     
