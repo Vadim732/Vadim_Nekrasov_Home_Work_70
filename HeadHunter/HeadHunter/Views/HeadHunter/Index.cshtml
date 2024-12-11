@@ -1,106 +1,73 @@
-﻿@model HeadHunter.ViewModels.IndexViewModel
+﻿@model List<Vacancy>
 
 @{
-    ViewBag.Title = "Все доступные вакансии и вакансии";
+    ViewBag.Title = "Все доступные вакансии";
 }
 
-<div class="mt-4">
-    @if (User.IsInRole("applicant"))
+<div class="container mt-4">
+    @if (Model == null || !Model.Any())
     {
-        @if (Model == null || !Model.Vacancies.Any())
-        {
-            <div class="alert alert-warning" role="alert">
-                Доступных вакансий не найдено.
-            </div>
-        }
-        else
-        {
-            <div class="row row-cols-1 g-3">
-                @foreach (var v in Model.Vacancies)
-                {
-                    <div class="col mb-2">
-                        <div class="card shadow-sm">
-                            <a href="@Url.Action("DetailsVacancy", "HeadHunter", new { id = v.Id })" class="card-body text-decoration-none">
-                                <h5 class="card-title">@v.Title</h5>
-                                <p class="card-text text-muted">Обновлено: @v.UpdatedAt</p>
-                            </a>
-                            @if (User.IsInRole("applicant"))
-                            {
-                                <div class="card-footer d-flex justify-content-end">
-                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#responseModal-@v.Id">
-                                        Откликнуться
-                                    </button>
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-                    <div class="modal fade" id="responseModal-@v.Id" tabindex="-1" aria-labelledby="responseModalLabel-@v.Id" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="responseModalLabel-@v.Id">Отклик на вакансию "@v.Title"</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form asp-action="SendResponse" asp-controller="HeadHunter" method="post">
-                                        <input type="hidden" name="VacancyId" value="@v.Id"/>
-                                        <div class="mb-3">
-                                            <label for="resumeSelect-@v.Id" class="form-label">Выберите резюме</label>
-                                            <select class="form-select" id="resumeSelect-@v.Id" name="ResumeId" required>
-                                                @if (ViewBag.Resumes != null && ViewBag.Resumes.Count > 0)
-                                                {
-                                                    foreach (var resume in ViewBag.Resumes)
-                                                    {
-                                                        <option value="@resume.Id">@resume.Title</option>
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    <option disabled selected>Нет доступных резюме</option>
-                                                }
-                                            </select>
-                                        </div>
-                                        <div class="d-flex justify-content-end">
-                                            <button type="submit" class="btn btn-primary">Отправить отклик</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
+        <div class="alert alert-warning" role="alert">
+            Доступных вакансий не найдено.
+        </div>
     }
-    @if (User.IsInRole("employer"))
+    else
     {
-        @if (Model == null || !Model.Resumes.Any())
-        {
-            <div class="alert alert-warning" role="alert">
-                Доступных резюме не найдено.
-            </div>
-        }
-        else
-        {
-            <div class="row row-cols-1 g-3">
-                @foreach (var r in Model.Resumes)
-                {
-                    <div class="col mb-2">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">@r.Title</h5>
-                                <p class="card-text">
-                                    Зарплата: @r.ExpectedSalary<br />
-                                    Email: <a href="mailto:@r.Email">@r.Email</a><br />
-                                    Telegram: <a href="@r.Telegram" target="_blank">@r.Telegram</a>
-                                </p>
-                                <p class="card-text text-muted">Обновлено: @r.LastUpdated</p>
+        <div class="row row-cols-1 g-3">
+            @foreach (var v in Model)
+            {
+                <div class="col mb-2">
+                    <div class="card shadow-sm">
+                        <a href="@Url.Action("DetailsVacancy", "HeadHunter", new { id = v.Id })" class="card-body text-decoration-none">
+                            <h5 class="card-title">@v.Title</h5>
+                            <p class="card-text text-muted">Обновлено: @v.UpdatedAt</p>
+                        </a>
+                        @if (User.IsInRole("applicant"))
+                        {
+                            <div class="card-footer d-flex justify-content-end">
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#responseModal-@v.Id">
+                                    Откликнуться
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <div class="modal fade" id="responseModal-@v.Id" tabindex="-1" aria-labelledby="responseModalLabel-@v.Id" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="responseModalLabel-@v.Id">Отклик на вакансию "@v.Title"</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form asp-action="SendResponse" asp-controller="HeadHunter" method="post">
+                                    <input type="hidden" name="VacancyId" value="@v.Id" />
+                                    <div class="mb-3">
+                                        <label for="resumeSelect-@v.Id" class="form-label">Выберите резюме</label>
+                                        <select class="form-select" id="resumeSelect-@v.Id" name="ResumeId" required>
+                                            @if (ViewBag.Resumes != null && ViewBag.Resumes.Count > 0)
+                                            {
+                                                foreach (var resume in ViewBag.Resumes)
+                                                {
+                                                    <option value="@resume.Id">@resume.Title</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option disabled selected>Нет доступных резюме</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary">Отправить отклик</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
-                }
-            </div>
-        }
+                </div>
+            }
+        </div>
     }
 </div>

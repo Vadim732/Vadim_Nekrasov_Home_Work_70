@@ -19,27 +19,23 @@ public class HeadHunterController : Controller
     }
     public async Task<IActionResult> Index()
     {
-        var vacancies = await _context.Vacancies.Where(v => v.IsPublished).ToListAsync();
-        var resumes = await _context.Resumes.Where(r => r.IsPublished).ToListAsync();
-        var user = await _userManager.GetUserAsync(User);
-        
+        List<Vacancy> vacancies = _context.Vacancies.Where(v => v.IsPublished == true).ToList();
         if (User.IsInRole("applicant"))
         {
-            ViewBag.Resumes = _context.Resumes.Where(r => r.UserId == user.Id).ToList();
+            var user = await _userManager.GetUserAsync(User);
+            ViewBag.Resumes = _context.Resumes.Where(a => a.UserId == user.Id).ToList();
         }
-        
+        return View(vacancies);
+    }
+    public async Task<IActionResult> IndexResumes()
+    {
+        List<Resume> resumes = _context.Resumes.Include(r => r.User).Where(r => r.IsPublished == true).ToList();
         if (User.IsInRole("employer"))
         {
-            ViewBag.Vacancies = _context.Vacancies.Where(v => v.EmployerId == user.Id).ToList();
+            var user = await _userManager.GetUserAsync(User);
+            ViewBag.Vacancies = _context.Vacancies.Where(a => a.EmployerId == user.Id).ToList();
         }
-
-        var model = new IndexViewModel
-        {
-            Vacancies = vacancies,
-            Resumes = resumes
-        };
-
-        return View(model);
+        return View(resumes);
     }
 
     [Authorize(Roles = "admin")]
@@ -318,6 +314,34 @@ public class HeadHunterController : Controller
 
         return RedirectToAction("MyFeedback");
     }
+    
+    [Authorize(Roles = "employer")]
+    [HttpPost]
+    public async Task<IActionResult> SendEmployerResponse(int resumeId, int vacancyId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+        var resume = await _context.Resumes.FindAsync(resumeId);
+        var vacancy = await _context.Vacancies.FindAsync(vacancyId);
+        if (resume == null || vacancy == null || vacancy.EmployerId != user.Id)
+        {
+            return NotFound("Резюме или вакансия не найдены, либо вы пытаетесь использовать чужую вакансию.");
+        }
+        var response = new Response
+        {
+            ResumeId = resumeId,
+            VacancyId = vacancyId,
+            SentAt = DateTime.UtcNow,
+            ApplicantId = resume.UserId
+        };
+        _context.Responses.Add(response);
+        await _context.SaveChangesAsync();
+        return RedirectToAction("IndexResumes");
+    }
+
     
     [Authorize(Roles = "applicant")]
     public async Task<IActionResult> MyFeedback()
