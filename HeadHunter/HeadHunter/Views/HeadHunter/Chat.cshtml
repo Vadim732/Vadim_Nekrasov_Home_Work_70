@@ -18,7 +18,14 @@
 
                     <div id="message-@m.Id" class="mt-2 @alignmentClass border-bottom border-secondary pb-2 message-item">
                         <div class="message @messageClass">
-                            <img src="@m.User.Avatar" alt="User avatar" class="rounded-circle comment-user-avatar">
+                            @if (m.User.Avatar != null)
+                            {
+                                <img src="@m.User.Avatar" alt="User avatar" class="rounded-circle comment-user-avatar">
+                            }
+                            else
+                            {
+                                <img src="https://i.pinimg.com/736x/6f/0b/3b/6f0b3baa01e2136b2e2d93709e622e2c.jpg" alt="User avatar" class="rounded-circle comment-user-avatar">
+                            }
                             <strong>@m.User.UserName</strong>
                             <span class="text-muted small">@m.DateOfDispatch</span>
                             <div>@m.Inscription</div>
@@ -52,6 +59,7 @@
             const remainingChars = $('#remaining-chars');
             const vacancyId = $('#vacancy-id').val();
             const resumeId = $('#resume-id').val();
+            const defaultAvatar = "https://i.pinimg.com/736x/6f/0b/3b/6f0b3baa01e2136b2e2d93709e622e2c.jpg";
 
             messageInput.on('input', function () {
                 const charsLeft = maxLength - messageInput.val().length;
@@ -78,7 +86,7 @@
                         
                         appendMessage({
                             userName: response.userName,
-                            avatar: response.avatar,
+                            avatar: response.avatar || defaultAvatar,
                             inscription: messageText,
                             dateOfDispatch: new Date().toLocaleString(),
                             isCurrentUser: true,
@@ -111,7 +119,7 @@
                                 
                                 appendMessage({
                                     userName: msg.userName,
-                                    avatar: msg.avatar,
+                                    avatar: msg.avatar || defaultAvatar,
                                     inscription: msg.inscription,
                                     dateOfDispatch: date,
                                     isCurrentUser: msg.userName === response.currentUser,
