@@ -312,7 +312,7 @@ public class HeadHunterController : Controller
         _context.Responses.Add(response);
         await _context.SaveChangesAsync();
 
-        return RedirectToAction("MyFeedback");
+        return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id } );
     }
     
     [Authorize(Roles = "employer")]
@@ -339,7 +339,7 @@ public class HeadHunterController : Controller
         };
         _context.Responses.Add(response);
         await _context.SaveChangesAsync();
-        return RedirectToAction("IndexResumes");
+        return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id } );
     }
 
     
@@ -426,5 +426,85 @@ public class HeadHunterController : Controller
         }
         
         return Unauthorized();
+    }
+    
+        public IActionResult Chat(int vacancyId, int resumeId)
+    {
+        var messages = _context.Messages
+            .Include(m => m.User)
+            .Where(m => m.VacancyId == vacancyId && m.ResumeId == resumeId)
+            .OrderBy(m => m.DateOfDispatch)
+            .ToList();
+
+        ViewBag.VacancyId = vacancyId;
+        ViewBag.ResumeId = resumeId;
+
+        return View(messages);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateMessage(int vacancyId, int resumeId, string inscription)
+    {
+        if (string.IsNullOrWhiteSpace(inscription))
+        {
+            return BadRequest(new { error = "Сообщение не может быть пустым." });
+        }
+
+        var creator = await _userManager.GetUserAsync(User);
+        if (creator == null)
+        {
+            return Unauthorized(new { error = "Не удалось определить пользователя." });
+        }
+
+        var message = new Message
+        {
+            Inscription = inscription,
+            DateOfDispatch = DateTime.UtcNow,
+            UserId = creator.Id,
+            VacancyId = vacancyId,
+            ResumeId = resumeId
+        };
+
+        _context.Messages.Add(message);
+        await _context.SaveChangesAsync();
+
+        return Json(new
+        {
+            avatar = creator.Avatar,
+            dateOfDispatch = message.DateOfDispatch.ToString("dd.MM.yyyy HH:mm:ss"),
+            userName = creator.UserName,
+            userid = creator.Id,
+            inscription = message.Inscription,
+            messageId = message.Id
+        });
+    }
+    
+    [HttpGet]
+    public IActionResult GetLatestMessages(int vacancyId, int resumeId, DateTime? lastMessageTime)
+    {
+        IQueryable<Message> query = _context.Messages
+            .Include(m => m.User)
+            .Where(m => m.VacancyId == vacancyId && m.ResumeId == resumeId)
+            .OrderByDescending(m => m.DateOfDispatch);
+
+        if (lastMessageTime.HasValue)
+        {
+            query = query.Where(m => m.DateOfDispatch > lastMessageTime.Value);
+        }
+
+        var messages = query
+            .Select(m => new
+            {
+                m.Id,
+                m.Inscription,
+                m.DateOfDispatch,
+                UserName = m.User.UserName,
+                Avatar = m.User.Avatar,
+                m.UserId
+            })
+            .OrderBy(m => m.DateOfDispatch)
+            .ToList();
+
+        return Json(new { messages, currentUser = User.Identity.Name });
     }
 }

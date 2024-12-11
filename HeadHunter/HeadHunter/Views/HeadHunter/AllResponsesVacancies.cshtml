@@ -37,9 +37,13 @@ else
                             {
                                 @foreach (var response in responses.Where(r => r.VacancyId == vacancy.Id))
                                 {
-                                    <div class="mb-1">
+                                    <div class="mb-3 p-2 border rounded">
                                         <h6><i class="fa-solid fa-user HHL"></i> @response.Resume.User.UserName</h6>
                                         <p><i class="fa-solid fa-address-book HHL"></i> Резюме: @response.Resume.Title</p>
+                                        <a href="@Url.Action("Chat", "HeadHunter", new { vacancyId = vacancy.Id, resumeId = response.ResumeId })" 
+                                           class="btn btn-outline-primary">
+                                            <i class="fa-solid fa-comments"></i> Перейти в чат
+                                        </a>
                                     </div>
                                 }
                             }
