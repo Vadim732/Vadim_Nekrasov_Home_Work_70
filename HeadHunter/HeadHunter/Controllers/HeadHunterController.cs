@@ -385,4 +385,46 @@ public class HeadHunterController : Controller
         }
         return RedirectToAction("Index");
     }
+
+    [Authorize(Roles = "applicant")]
+    public async Task<IActionResult> DeleteResume(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            var resume = await _context.Resumes.FirstOrDefaultAsync(r => r.Id == id);
+            if (resume != null)
+            {
+                _context.Resumes.Remove(resume);
+                await _context.SaveChangesAsync();
+    
+                return RedirectToAction("Profile", "Account");
+            }
+    
+            return NotFound("Ошибка: Резюме не найдено!");
+        }
+        
+        return Unauthorized();
+    }
+    
+    [Authorize(Roles = "employer")]
+    public async Task<IActionResult> DeleteVacancy(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user != null)
+        {
+            var vacancy = await _context.Vacancies.FirstOrDefaultAsync(v => v.Id == id);
+            if (vacancy != null)
+            {
+                _context.Vacancies.Remove(vacancy);
+                await _context.SaveChangesAsync();
+    
+                return RedirectToAction("Profile", "Account");
+            }
+            
+            return NotFound("Ошибка: Вакансия не найдена!");
+        }
+        
+        return Unauthorized();
+    }
 }
