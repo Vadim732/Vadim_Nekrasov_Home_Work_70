@@ -1,7 +1,9 @@
-﻿@model User
+﻿@using HeadHunter.ViewModels
+@model User
 
 @{
     ViewBag.Title = "User profile";
+    var edm = ViewBag.EditViewModel as EditViewModel;
 }
 
 <div class="mt-4">
@@ -21,10 +23,10 @@
                 <h2 class="me-3">@Model.UserName</h2>
                 @if (!User.IsInRole("admin"))
                 {
-                    <a asp-action="Edit" asp-controller="Account" asp-route-userId="@ViewBag.currentUserId" class="btn btn-outline-secondary"><i class="fa-solid fa-user-pen"></i> Редактировать</a>
-                    @* <button type="button" asp-action="Edit" asp-controller="Account" asp-route-userId="@ViewBag.currentUserId" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal-@Model.Id"> *@
-                    @*     <i class="fa-solid fa-user-pen"></i> Редактировать *@
-                    @* </button> *@
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <i class="fa-solid fa-user-pen"></i>
+                        Редактировать
+                    </button>
                 }
             </div>
             @if (Model.PhoneNumber != null)
@@ -135,55 +137,47 @@
     </div>
 }
 
-@* <div class="modal fade" id="modal-@Model.Id" tabindex="-1" aria-labelledby="modalLabel-@Model.Id" aria-hidden="true"> *@
-@*     <div class="modal-dialog"> *@
-@*         <div class="modal-content"> *@
-@*             <div class="modal-header"> *@
-@*                 <h1 class="modal-title fs-5" id="modalLabel-@Model.Id"><i class="fa-solid fa-pen"></i> Редактировать аккаунт</h1> *@
-@*                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
-@*             </div> *@
-@*             <div class="modal-body bg-dark text-white"> *@
-@*                 <form asp-action="Edit" asp-controller="Account" asp-anti-forgery="true"> *@
-@*                     <div asp-validation-summary="ModelOnly" class="text-error"></div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="UserName" class="form-label">Логин</label> *@
-@*                         <input type="text" id="UserName" class="form-control w-100" asp-for="UserName" placeholder="Введите логин..."> *@
-@*                         <span asp-validation-for="UserName" class="text-error"></span> *@
-@*                     </div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="Email" class="form-label">Электронная почта</label> *@
-@*                         <input type="email" id="Email" class="form-control w-100" asp-for="Email" placeholder="Введите ваш адрес электронной почты..."> *@
-@*                         <span asp-validation-for="Email" class="text-error"></span> *@
-@*                         @if (ViewBag.ErrorMessage != null) *@
-@*                         { *@
-@*                             <span class="text-error">@ViewBag.ErrorMessage</span> *@
-@*                         } *@
-@*                     </div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="DateOfBirth" class="form-label">Дата рождения</label> *@
-@*                         <input type="date" id="DateOfBirth" class="form-control w-100" asp-for="DateOfBirth" placeholder="Укажите дату рождения..."> *@
-@*                         <span asp-validation-for="DateOfBirth" class="text-error"></span> *@
-@*                     </div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="Avatar" class="form-label">Ссылка на аватар</label> *@
-@*                         <input type="text" id="Avatar" class="form-control w-100" asp-for="Avatar" placeholder="Введите ссылку на аватар..."> *@
-@*                         <span asp-validation-for="Avatar" class="text-error"></span> *@
-@*                     </div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="PhoneNumber" class="form-label">Номер телефона</label> *@
-@*                         <input type="number" id="PhoneNumber" class="form-control w-100" asp-for="PhoneNumber" placeholder="Укажите номер телефона..."> *@
-@*                         <span asp-validation-for="PhoneNumber" class="text-error"></span> *@
-@*                     </div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="Password" class="form-label">Пароль</label> *@
-@*                         <input type="password" id="Password" class="form-control w-100" asp-for="PhoneNumber" placeholder="Укажите номер телефона..."> *@
-@*                         <span asp-validation-for="Password" class="text-error"></span> *@
-@*                     </div> *@
-@*                     <div class="d-flex justify-content-center mt-3"> *@
-@*                         <button type="submit" class="btn btn-outline-light w-50"><i class="fa-solid fa-floppy-disk"></i> Сохранить</button> *@
-@*                     </div> *@
-@*                 </form> *@
-@*             </div> *@
-@*         </div> *@
-@*     </div> *@
-@* </div> *@
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Редактировать</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Edit" method="post">
+                    <div class="mb-3">
+                        <label for="UserName" class="form-label">Логин</label>
+                        <input type="text" class="form-control" id="UserName" name="UserName" value="@edm.UserName" required />
+                        <span class="text-danger">@ViewData["UserNameError"]</span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Электронная почта</label>
+                        <input type="email" class="form-control" id="Email" name="Email" value="@edm.Email" required />
+                        <span class="text-danger">@ViewData["EmailError"]</span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="DateOfBirth" class="form-label">Дата рождения</label>
+                        <input type="date" class="form-control" id="DateOfBirth" name="DateOfBirth" value="@edm.DateOfBirth.ToString("yyyy-MM-dd")" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="PhoneNumber" class="form-label">Номер телефона</label>
+                        <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@edm.PhoneNumber" required />
+                        <span class="text-danger">@ViewData["PhoneNumberError"]</span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Avatar" class="form-label">Ссылка на аватар</label>
+                        <input type="url" class="form-control" id="Avatar" name="Avatar" value="@edm.Avatar" />
+                        <span class="text-danger">@ViewData["AvatarError"]</span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="Password" name="Password" value="@edm.Password" required />
+                        <span class="text-danger">@ViewData["PasswordError"]</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary form-control">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

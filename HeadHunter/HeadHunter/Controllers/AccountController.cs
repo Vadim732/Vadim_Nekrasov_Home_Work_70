@@ -51,6 +51,15 @@ public class AccountController : Controller
                 ViewBag.Resumes = applicantResumes;
             }
 
+            var editViewModel = new EditViewModel
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                DateOfBirth = user.DateOfBirth,
+                Avatar = user.Avatar,
+            };
+            ViewBag.EditViewModel = editViewModel;
             return View(user);
         }
         return RedirectToAction("Login", "Account");
@@ -206,14 +215,14 @@ public class AccountController : Controller
                 var existingUserEmail = await _userManager.FindByEmailAsync(model.Email);
                 if (existingUserEmail != null && existingUserEmail.Id != user.Id)
                 {
-                    ViewBag.ErrorMessage = "Ошибка: Этот адрес электронной почты уже используется другим пользователем!";
+                    ModelState.AddModelError("Email", "Ошибка: Этот адрес электронной почты уже используется другим пользователем!");
                     return View(model);
                 }
             
                 var existingUserName = await _userManager.FindByNameAsync(model.UserName);
                 if (existingUserName != null && existingUserName.Id != user.Id)
                 {
-                    ViewBag.ErrorMessage = "Ошибка: Этот логин уже используется другим пользователем!";
+                    ModelState.AddModelError("UserName", "Ошибка: Этот логин уже используется другим пользователем!");
                     return View(model);
                 }
             
@@ -225,7 +234,7 @@ public class AccountController : Controller
                 }
                 if (userAge < 18)
                 {
-                    ViewBag.ErrorMessage = "Ошибка: Нельзя зарегистрироваться пользователям моложе 18 лет!";
+                    ModelState.AddModelError("DateOfBirth", "Ошибка: Нельзя зарегистрироваться пользователям моложе 18 лет!");
                     return View(model);
                 }
                 
