@@ -80,3 +80,7 @@ body {
 .time-card {
   color: #b4b4b4;
 }
+
+.filt-inp {
+  width: auto;
+}

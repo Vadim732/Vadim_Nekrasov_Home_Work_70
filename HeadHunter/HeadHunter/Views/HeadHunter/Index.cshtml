@@ -7,6 +7,26 @@
     var pageViewModel = ViewBag.PageViewModel as PageViewModel;
 }
 
+<div class="mb-2 d-flex align-items-center bg-dark text-white p-2">
+    <a asp-action="Index" asp-controller="HeadHunter" asp-route-sortVacancyState="@ViewBag.SalarySort" class="btn btn-light me-4">Сортировать по зарплате</a>
+    <form method="get" class="d-flex align-items-center me-4">
+        <select name="category" class="form-select me-2 filt-inp">
+            <option value="">Все категории</option>
+            @foreach (var category in ViewBag.Categories)
+            {
+                <option value="@category">@category</option>
+            }
+        </select>
+        <button type="submit" class="btn btn-outline-light">Поиск</button>
+    </form>
+    <form method="get" class="d-flex align-items-center">
+        <input type="text" name="title" value="@ViewContext.HttpContext.Request.Query["title"]" class="form-control me-2 filt-inp" placeholder="Введите часть заголовка..." />
+        <button type="submit" class="btn btn-outline-light">Поиск</button>
+    </form>
+</div>
+
+
+
 <div class="container mt-4">
     @if (Model == null || !Model.Any())
     {
@@ -17,29 +37,6 @@
     else
     {
         <div class="row row-cols-1 g-3">
-            <div class="mb-2">
-                <a asp-action="Index" asp-controller="HeadHunter" asp-route-sortVacancyState="@ViewBag.SalarySort" class="btn btn-dark">Сортировать по зарплате</a>
-                <form method="get" class="mt-2">
-                    <div class="form-inline border-white border-bottom pb-2">
-                        <p class="text-secondary">Фильтравать по категориям</p>
-                        <select name="category" class="form-select me-2 w-100">
-                            <option value="">Все категории</option>
-                            @foreach (var category in ViewBag.Categories)
-                            {
-                                <option value="@category" selected>@category</option>
-                            }
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-outline-dark mt-1"> Поиск</button>
-                </form>
-                <form method="get" class="mt-2">
-                    <div class="form-inline">
-                        <p class="text-secondary">Введите часть заголовка вакансии для поиска</p>
-                        <input type="text" name="title" value="@ViewContext.HttpContext.Request.Query["title"]" class="form-control" />
-                    </div>
-                    <button type="submit" class="btn btn-outline-dark mt-1">Поиск</button>
-                </form>
-            </div>
             @foreach (var v in Model)
             {
                 <div class="col mb-2">
