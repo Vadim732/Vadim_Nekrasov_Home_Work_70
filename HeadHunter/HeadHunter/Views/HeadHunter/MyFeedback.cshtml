@@ -12,6 +12,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">@response.Vacancy.Title</h5>
+                        <a asp-action="DetailsVacancy" asp-route-id="@response.Vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-success btn-sm me-2">Подробнее</a>
                     </div>
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2 text-muted">Резюме: @response.Resume.Title</h6>

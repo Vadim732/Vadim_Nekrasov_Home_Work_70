@@ -10,6 +10,7 @@ public class Vacancy
     public string Title { get; set; }
     
     [Required(ErrorMessage = "Введите заработную плату")]
+    [Range(1, int.MaxValue, ErrorMessage = "Зарплата должна быть больше 0")]
     public int Salary { get; set; }
     
     [Required(ErrorMessage = "Введите описание")]

@@ -19,7 +19,11 @@ public class HeadHunterController : Controller
     }
     public async Task<IActionResult> Index()
     {
-        List<Vacancy> vacancies = _context.Vacancies.Where(v => v.IsPublished == true).ToList();
+        List<Vacancy> vacancies = _context.Vacancies
+            .Where(v => v.IsPublished == true)
+            .OrderByDescending(v => v.UpdatedAt)
+            .ToList();
+
         if (User.IsInRole("applicant"))
         {
             var user = await _userManager.GetUserAsync(User);
@@ -30,7 +34,11 @@ public class HeadHunterController : Controller
     [Authorize(Roles = "employer")]
     public async Task<IActionResult> IndexResumes()
     {
-        List<Resume> resumes = _context.Resumes.Include(r => r.User).Where(r => r.IsPublished == true).ToList();
+        List<Resume> resumes = _context.Resumes
+            .Include(r => r.User)
+            .Where(r => r.IsPublished == true)
+            .OrderByDescending(r => r.LastUpdated)
+            .ToList();
         if (User.IsInRole("employer"))
         {
             var user = await _userManager.GetUserAsync(User);
@@ -71,15 +79,24 @@ public class HeadHunterController : Controller
     }
     [HttpPost]
     [Authorize(Roles = "employer")]
-    public async Task<IActionResult> CreateVacancy(Vacancy vacancy) // Проверка на год от и до 
+    public async Task<IActionResult> CreateVacancy(Vacancy vacancy) 
     {
         if (ModelState.IsValid)
         {
+            if (vacancy.ExperienceRequiredTo < vacancy.ExperienceRequiredFrom)
+            {
+                ModelState.AddModelError(string.Empty, "Опыт работы (до) не может быть меньше опыта работы (от).");
+            }
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = _context.Categories.ToList();
+                return View(vacancy);
+            }
             var creator = await _userManager.GetUserAsync(User);
             vacancy.UpdatedAt = DateTime.UtcNow;
             vacancy.EmployerId = creator.Id;
             _context.Vacancies.Add(vacancy);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return RedirectToAction("Profile", "Account");
         }
         ViewBag.Categories = _context.Categories.ToList();
@@ -110,7 +127,7 @@ public class HeadHunterController : Controller
     }
     
     [Authorize(Roles = "employer")]
-    public async Task<IActionResult> EditVacancy(int id) // Проверка на год от и до 
+    public async Task<IActionResult> EditVacancy(int id)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -132,7 +149,7 @@ public class HeadHunterController : Controller
 
     [HttpPost]
     [Authorize(Roles = "employer")]
-    public async Task<IActionResult> EditVacancy(Vacancy vacancy) // Проверка на год от и до 
+    public async Task<IActionResult> EditVacancy(Vacancy vacancy)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -148,9 +165,20 @@ public class HeadHunterController : Controller
         {
             return Unauthorized();
         }
+        if (vacancy.ExperienceRequiredTo < vacancy.ExperienceRequiredFrom)
+        {
+            ModelState.AddModelError("ExperienceRequiredTo", "Опыт работы (до) не может быть меньше опыта работы (от).");
+        }
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            return View(vacancy);
+        }
         existingVacancy.Title = vacancy.Title;
         existingVacancy.Description = vacancy.Description;
         existingVacancy.CategoryId = vacancy.CategoryId;
+        existingVacancy.ExperienceRequiredFrom = vacancy.ExperienceRequiredFrom;
+        existingVacancy.ExperienceRequiredTo = vacancy.ExperienceRequiredTo;
         existingVacancy.UpdatedAt = DateTime.UtcNow;
         _context.Vacancies.Update(existingVacancy);
         await _context.SaveChangesAsync();
@@ -337,7 +365,7 @@ public class HeadHunterController : Controller
 
     [Authorize(Roles = "applicant")]
     [HttpPost]
-    public async Task<IActionResult> SendResponse(int vacancyId, int resumeId) // Сделать проверку чтоб нельзя было отзываться одним и тем же резюме на ту же вакансию
+    public async Task<IActionResult> SendResponse(int vacancyId, int resumeId) 
     {
         var user = await _userManager.GetUserAsync(User);
 
@@ -351,6 +379,12 @@ public class HeadHunterController : Controller
         if (vacancy == null || resume == null || resume.UserId != user.Id)
         {
             return NotFound("Вакансия или резюме не найдены, либо вы пытаетесь использовать чужое резюме.");
+        }
+        var existingResponse = await _context.Responses
+            .FirstOrDefaultAsync(r => r.VacancyId == vacancyId && r.ResumeId == resumeId);
+        if (existingResponse != null)
+        {
+            return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id });
         }
         var response = new Response
         {
@@ -367,7 +401,7 @@ public class HeadHunterController : Controller
     
     [Authorize(Roles = "employer")]
     [HttpPost]
-    public async Task<IActionResult> SendEmployerResponse(int resumeId, int vacancyId) // Сделать проверку чтоб нельзя было отзываться одним и тем же резюме на ту же вакансию
+    public async Task<IActionResult> SendEmployerResponse(int resumeId, int vacancyId) 
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -379,6 +413,12 @@ public class HeadHunterController : Controller
         if (resume == null || vacancy == null || vacancy.EmployerId != user.Id)
         {
             return NotFound("Резюме или вакансия не найдены, либо вы пытаетесь использовать чужую вакансию.");
+        }
+        var existingResponse = await _context.Responses
+            .FirstOrDefaultAsync(r => r.VacancyId == vacancyId && r.ResumeId == resumeId);
+        if (existingResponse != null)
+        {
+            return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id });
         }
         var response = new Response
         {
