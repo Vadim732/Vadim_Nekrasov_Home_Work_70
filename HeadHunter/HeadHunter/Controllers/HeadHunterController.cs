@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
 
 namespace Delivery.Controllers;
 
@@ -18,19 +20,25 @@ public class HeadHunterController : Controller
         _userManager = userManager;
         _context = context;
     }
-    public async Task<IActionResult> Index(string title, string category = null, SortVacancyState sortVacancyState = SortVacancyState.SalaryAsc, int pageNumber = 1)
+
+    public async Task<IActionResult> Index(string title, string category = null,
+        SortVacancyState sortVacancyState = SortVacancyState.SalaryAsc, int pageNumber = 1)
     {
-        IQueryable<Vacancy> vacancy = _context.Vacancies.Where(v => v.IsPublished == true).OrderByDescending(v => v.UpdatedAt);
+        IQueryable<Vacancy> vacancy =
+            _context.Vacancies.Where(v => v.IsPublished == true).OrderByDescending(v => v.UpdatedAt);
         if (!string.IsNullOrEmpty(category))
         {
             vacancy = vacancy.Where(v => v.Category.Name == category);
         }
+
         if (!string.IsNullOrWhiteSpace(title))
         {
             vacancy = vacancy.Where(v => v.Title.ToLower().Contains(title.ToLower()));
         }
 
-        ViewBag.SalarySort = sortVacancyState == SortVacancyState.SalaryAsc ? SortVacancyState.SalaryDesc : SortVacancyState.SalaryAsc;
+        ViewBag.SalarySort = sortVacancyState == SortVacancyState.SalaryAsc
+            ? SortVacancyState.SalaryDesc
+            : SortVacancyState.SalaryAsc;
         switch (sortVacancyState)
         {
             case SortVacancyState.SalaryAsc:
@@ -58,6 +66,7 @@ public class HeadHunterController : Controller
 
         return View(paginatedVacancies);
     }
+
     [Authorize(Roles = "employer")]
     public async Task<IActionResult> IndexResumes()
     {
@@ -71,6 +80,7 @@ public class HeadHunterController : Controller
             var user = await _userManager.GetUserAsync(User);
             ViewBag.Vacancies = _context.Vacancies.Where(a => a.EmployerId == user.Id).ToList();
         }
+
         return View(resumes);
     }
 
@@ -90,23 +100,26 @@ public class HeadHunterController : Controller
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+
         return View();
     }
+
     [Authorize(Roles = "admin")]
     public IActionResult IndexCategories()
     {
         return View(_context.Categories.ToList());
     }
-    
+
     [Authorize(Roles = "employer")]
     public IActionResult CreateVacancy()
     {
         ViewBag.Categories = _context.Categories.ToList();
         return View();
     }
+
     [HttpPost]
     [Authorize(Roles = "employer")]
-    public async Task<IActionResult> CreateVacancy(Vacancy vacancy) 
+    public async Task<IActionResult> CreateVacancy(Vacancy vacancy)
     {
         if (ModelState.IsValid)
         {
@@ -114,11 +127,13 @@ public class HeadHunterController : Controller
             {
                 ModelState.AddModelError(string.Empty, "Опыт работы (до) не может быть меньше опыта работы (от).");
             }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Categories = _context.Categories.ToList();
                 return View(vacancy);
             }
+
             var creator = await _userManager.GetUserAsync(User);
             vacancy.UpdatedAt = DateTime.UtcNow;
             vacancy.EmployerId = creator.Id;
@@ -126,16 +141,18 @@ public class HeadHunterController : Controller
             await _context.SaveChangesAsync();
             return RedirectToAction("Profile", "Account");
         }
+
         ViewBag.Categories = _context.Categories.ToList();
         return View(vacancy);
     }
-    
+
     [Authorize(Roles = "applicant")]
     public IActionResult CreateResume()
     {
         ViewBag.Categories = _context.Categories.ToList();
         return View();
     }
+
     [HttpPost]
     [Authorize(Roles = "applicant")]
     public async Task<IActionResult> CreateResume(Resume resume)
@@ -165,10 +182,11 @@ public class HeadHunterController : Controller
             await _context.SaveChangesAsync();
             return RedirectToAction("Profile", "Account");
         }
+
         ViewBag.Categories = _context.Categories.ToList();
         return View(resume);
     }
-    
+
     [Authorize(Roles = "employer")]
     public async Task<IActionResult> EditVacancy(int id)
     {
@@ -177,15 +195,18 @@ public class HeadHunterController : Controller
         {
             return Unauthorized();
         }
+
         var vacancy = await _context.Vacancies.FirstOrDefaultAsync(v => v.Id == id);
         if (vacancy == null)
         {
             return NotFound("Такая вакансия не найдена");
         }
+
         if (vacancy.EmployerId != user.Id)
         {
             return Unauthorized();
         }
+
         ViewBag.Categories = await _context.Categories.ToListAsync();
         return View(vacancy);
     }
@@ -199,24 +220,30 @@ public class HeadHunterController : Controller
         {
             return Unauthorized();
         }
+
         var existingVacancy = await _context.Vacancies.FirstOrDefaultAsync(v => v.Id == vacancy.Id);
         if (existingVacancy == null)
         {
             return NotFound("Такая вакансия не найдена");
         }
+
         if (existingVacancy.EmployerId != user.Id)
         {
             return Unauthorized();
         }
+
         if (vacancy.ExperienceRequiredTo < vacancy.ExperienceRequiredFrom)
         {
-            ModelState.AddModelError("ExperienceRequiredTo", "Опыт работы (до) не может быть меньше опыта работы (от).");
+            ModelState.AddModelError("ExperienceRequiredTo",
+                "Опыт работы (до) не может быть меньше опыта работы (от).");
         }
+
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _context.Categories.ToListAsync();
             return View(vacancy);
         }
+
         existingVacancy.Title = vacancy.Title;
         existingVacancy.Description = vacancy.Description;
         existingVacancy.CategoryId = vacancy.CategoryId;
@@ -228,6 +255,7 @@ public class HeadHunterController : Controller
 
         return RedirectToAction("Profile", "Account");
     }
+
     [Authorize(Roles = "applicant")]
     public async Task<IActionResult> EditResume(int id)
     {
@@ -236,15 +264,18 @@ public class HeadHunterController : Controller
         {
             return Unauthorized();
         }
+
         var resume = await _context.Resumes.FirstOrDefaultAsync(r => r.Id == id);
         if (resume == null)
         {
             return NotFound("Такое резюме не найдено");
         }
+
         if (resume.UserId != user.Id)
         {
             return Unauthorized();
         }
+
         ViewBag.Categories = await _context.Categories.ToListAsync();
         return View(resume);
     }
@@ -258,15 +289,18 @@ public class HeadHunterController : Controller
         {
             return Unauthorized();
         }
+
         var existingResume = await _context.Resumes.FirstOrDefaultAsync(r => r.Id == resume.Id);
         if (existingResume == null)
         {
             return NotFound("Такое резюме не найдено");
         }
+
         if (existingResume.UserId != user.Id)
         {
             return Unauthorized();
         }
+
         existingResume.Title = resume.Title;
         existingResume.Email = resume.Email;
         existingResume.PhoneNumber = resume.PhoneNumber;
@@ -290,6 +324,7 @@ public class HeadHunterController : Controller
         {
             return NotFound("Такая вакансия не найдена");
         }
+
         return View(vacancy);
     }
 
@@ -304,8 +339,10 @@ public class HeadHunterController : Controller
         {
             return NotFound("Такое резюме не найдено");
         }
+
         return View(resume);
     }
+
     [Authorize(Roles = "employer")]
     public IActionResult PublicationVacancy(int id)
     {
@@ -314,14 +351,16 @@ public class HeadHunterController : Controller
         {
             return NotFound("Такая вакансия не найдена");
         }
+
         if (vacancy.IsPublished == true)
         {
             return NotFound("Эта вакансия уже опубликована");
         }
+
         vacancy.IsPublished = true;
         _context.Update(vacancy);
         _context.SaveChanges();
-        return RedirectToAction("Profile", "Account");  
+        return RedirectToAction("Profile", "Account");
     }
 
     [Authorize(Roles = "applicant")]
@@ -337,12 +376,13 @@ public class HeadHunterController : Controller
         {
             return NotFound("Это резюме уже опубликовано");
         }
+
         resume.IsPublished = true;
         _context.Update(resume);
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");
     }
-    
+
     [Authorize(Roles = "employer")]
     public IActionResult UnpublishVacancy(int id)
     {
@@ -351,10 +391,12 @@ public class HeadHunterController : Controller
         {
             return NotFound("Такая вакансия не найдена");
         }
+
         if (vacancy.IsPublished == false)
         {
             return NotFound("Эта вакансия уже не опубликована");
         }
+
         vacancy.IsPublished = false;
         _context.Update(vacancy);
         _context.SaveChanges();
@@ -369,17 +411,19 @@ public class HeadHunterController : Controller
         {
             return NotFound("Такое резюме не найдено");
         }
+
         if (resume.IsPublished == false)
         {
             return NotFound("Это резюме уже не опубликовано");
         }
+
         resume.IsPublished = false;
         _context.Update(resume);
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");
     }
 
-    
+
     [Authorize(Roles = "employer")]
     public IActionResult UpdateVacancy(int id)
     {
@@ -388,12 +432,13 @@ public class HeadHunterController : Controller
         {
             return NotFound("Такая вакансия не найдена");
         }
+
         vacancy.UpdatedAt = DateTime.UtcNow;
         _context.Update(vacancy);
         _context.SaveChanges();
         return RedirectToAction("Profile", "Account");
     }
-    
+
     [Authorize(Roles = "applicant")]
     public IActionResult UpdateResume(int id)
     {
@@ -402,6 +447,7 @@ public class HeadHunterController : Controller
         {
             return NotFound("Такое резюме не найдено");
         }
+
         resume.LastUpdated = DateTime.UtcNow;
         _context.Update(resume);
         _context.SaveChanges();
@@ -410,7 +456,7 @@ public class HeadHunterController : Controller
 
     [Authorize(Roles = "applicant")]
     [HttpPost]
-    public async Task<IActionResult> SendResponse(int vacancyId, int resumeId) 
+    public async Task<IActionResult> SendResponse(int vacancyId, int resumeId)
     {
         var user = await _userManager.GetUserAsync(User);
 
@@ -418,6 +464,7 @@ public class HeadHunterController : Controller
         {
             return Unauthorized();
         }
+
         var vacancy = await _context.Vacancies.FindAsync(vacancyId);
         var resume = await _context.Resumes.FindAsync(resumeId);
 
@@ -425,12 +472,14 @@ public class HeadHunterController : Controller
         {
             return NotFound("Вакансия или резюме не найдены, либо вы пытаетесь использовать чужое резюме.");
         }
+
         var existingResponse = await _context.Responses
             .FirstOrDefaultAsync(r => r.VacancyId == vacancyId && r.ResumeId == resumeId);
         if (existingResponse != null)
         {
             return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id });
         }
+
         var response = new Response
         {
             ResumeId = resumeId,
@@ -441,30 +490,33 @@ public class HeadHunterController : Controller
         _context.Responses.Add(response);
         await _context.SaveChangesAsync();
 
-        return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id } );
+        return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id });
     }
-    
+
     [Authorize(Roles = "employer")]
     [HttpPost]
-    public async Task<IActionResult> SendEmployerResponse(int resumeId, int vacancyId) 
+    public async Task<IActionResult> SendEmployerResponse(int resumeId, int vacancyId)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             return Unauthorized();
         }
+
         var resume = await _context.Resumes.FindAsync(resumeId);
         var vacancy = await _context.Vacancies.FindAsync(vacancyId);
         if (resume == null || vacancy == null || vacancy.EmployerId != user.Id)
         {
             return NotFound("Резюме или вакансия не найдены, либо вы пытаетесь использовать чужую вакансию.");
         }
+
         var existingResponse = await _context.Responses
             .FirstOrDefaultAsync(r => r.VacancyId == vacancyId && r.ResumeId == resumeId);
         if (existingResponse != null)
         {
             return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id });
         }
+
         var response = new Response
         {
             ResumeId = resumeId,
@@ -474,10 +526,10 @@ public class HeadHunterController : Controller
         };
         _context.Responses.Add(response);
         await _context.SaveChangesAsync();
-        return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id } );
+        return RedirectToAction("Chat", new { vacancyid = vacancyId, resumeId = resume.Id });
     }
 
-    
+
     [Authorize(Roles = "applicant")]
     public async Task<IActionResult> MyFeedback()
     {
@@ -486,6 +538,7 @@ public class HeadHunterController : Controller
         {
             return Unauthorized();
         }
+
         var responses = await _context.Responses
             .Include(r => r.Resume)
             .Include(r => r.Vacancy)
@@ -494,7 +547,7 @@ public class HeadHunterController : Controller
         return View(responses);
     }
 
-    
+
     [Authorize(Roles = "employer")]
     public async Task<IActionResult> AllResponsesVacancies()
     {
@@ -507,7 +560,7 @@ public class HeadHunterController : Controller
                 .Include(v => v.Employer)
                 .ToListAsync();
             ViewBag.Vacancies = employerVacancies;
-            
+
             var responses = await _context.Responses
                 .Where(r => employerVacancies.Select(v => v.Id).Contains(r.VacancyId))
                 .Include(r => r.Resume)
@@ -518,6 +571,7 @@ public class HeadHunterController : Controller
 
             return View(employerVacancies);
         }
+
         return RedirectToAction("Index");
     }
 
@@ -532,16 +586,16 @@ public class HeadHunterController : Controller
             {
                 _context.Resumes.Remove(resume);
                 await _context.SaveChangesAsync();
-    
+
                 return RedirectToAction("Profile", "Account");
             }
-    
+
             return NotFound("Ошибка: Резюме не найдено!");
         }
-        
+
         return Unauthorized();
     }
-    
+
     [Authorize(Roles = "employer")]
     public async Task<IActionResult> DeleteVacancy(int id)
     {
@@ -553,17 +607,17 @@ public class HeadHunterController : Controller
             {
                 _context.Vacancies.Remove(vacancy);
                 await _context.SaveChangesAsync();
-    
+
                 return RedirectToAction("Profile", "Account");
             }
-            
+
             return NotFound("Ошибка: Вакансия не найдена!");
         }
-        
+
         return Unauthorized();
     }
-    
-        public IActionResult Chat(int vacancyId, int resumeId)
+
+    public IActionResult Chat(int vacancyId, int resumeId)
     {
         var messages = _context.Messages
             .Include(m => m.User)
@@ -613,7 +667,7 @@ public class HeadHunterController : Controller
             messageId = message.Id
         });
     }
-    
+
     [HttpGet]
     public IActionResult GetLatestMessages(int vacancyId, int resumeId, DateTime? lastMessageTime)
     {
@@ -641,5 +695,66 @@ public class HeadHunterController : Controller
             .ToList();
 
         return Json(new { messages, currentUser = User.Identity.Name });
+    }
+
+    [Authorize(Roles = "applicant")]
+    public async Task<IActionResult> DownloadResume(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var resume = await _context.Resumes.Include(r => r.Category).Include(r => r.WorkExperiences)
+            .Include(r => r.EducationAndCourses).FirstOrDefaultAsync(r => r.Id == id && r.UserId == user.Id);
+        if (resume == null)
+        {
+            return NotFound("Ошибка: Резюме не найдено!");
+        }
+
+        var document = new PdfDocument();
+        var page = document.AddPage();
+        var graphics = XGraphics.FromPdfPage(page);
+        var font = new XFont("Arial", 12, XFontStyle.Regular);
+        graphics.DrawString($"Резюме: {resume.Title}", font, XBrushes.Black, new XRect(0, 0, page.Width, page.Height),
+            XStringFormats.TopLeft);
+        graphics.DrawString($"Категория: {resume.Category?.Name}", font, XBrushes.Black,
+            new XRect(0, 20, page.Width, page.Height), XStringFormats.TopLeft);
+        graphics.DrawString($"Ожидаемая зарплата: {resume.ExpectedSalary:C}", font, XBrushes.Black,
+            new XRect(0, 40, page.Width, page.Height), XStringFormats.TopLeft);
+        graphics.DrawString(
+            $"Контакты: Телеграм - {resume.Telegram}, Email - {resume.Email}, Телефон - {resume.PhoneNumber}", font,
+            XBrushes.Black, new XRect(0, 60, page.Width, page.Height), XStringFormats.TopLeft);
+        int yOffset = 100;
+
+        graphics.DrawString("Опыт работы:", font, XBrushes.Black, new XRect(0, yOffset, page.Width, page.Height),
+            XStringFormats.TopLeft);
+        yOffset += 20;
+        foreach (var experience in resume.WorkExperiences)
+        {
+            graphics.DrawString(
+                $"- {experience.Position} в {experience.CompanyName} ({experience.StartDate:MM/yyyy} - {experience.EndDate:MM/yyyy})",
+                font, XBrushes.Black, new XRect(0, yOffset, page.Width, page.Height), XStringFormats.TopLeft);
+            yOffset += 20;
+        }
+
+        graphics.DrawString("Образование и курсы:", font, XBrushes.Black,
+            new XRect(0, yOffset, page.Width, page.Height), XStringFormats.TopLeft);
+        yOffset += 20;
+        foreach (var education in resume.EducationAndCourses)
+        {
+            graphics.DrawString(
+                $"- {education.InstitutionName} - {education.DegreeOrCertification} ({education.StartDate:MM/yyyy} - {education.EndDate:MM/yyyy})",
+                font, XBrushes.Black, new XRect(0, yOffset, page.Width, page.Height), XStringFormats.TopLeft);
+            yOffset += 20;
+        }
+
+        using (var stream = new MemoryStream())
+        {
+            document.Save(stream, false);
+            stream.Position = 0;
+            return File(stream.ToArray(), "application/pdf", $"{resume.Title}.pdf");
+        }
     }
 }
