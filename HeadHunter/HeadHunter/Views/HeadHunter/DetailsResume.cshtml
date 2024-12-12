@@ -90,5 +90,6 @@
     </div>
     <div class="mt-4">
         <a href="@Url.Action("Index", "HeadHunter")" class="btn btn-outline-secondary"><i class="fa-solid fa-chevron-left"></i> Назад к резюме</a>
+        <a href="@Url.Action("DownloadResume", "HeadHunter", new { id = Model.Id })" class="btn btn-outline-secondary"><i class="fa-solid fa-file-arrow-down"></i> Скачать</a>
     </div>
 </div>
