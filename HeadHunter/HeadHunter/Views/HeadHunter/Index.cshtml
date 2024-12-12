@@ -1,7 +1,10 @@
-﻿@model List<Vacancy>
+﻿@using HeadHunter.ViewModels
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<Vacancy>
 
 @{
     ViewBag.Title = "Все доступные вакансии";
+    var pageViewModel = ViewBag.PageViewModel as PageViewModel;
 }
 
 <div class="container mt-4">
@@ -68,6 +71,16 @@
                         </div>
                     </div>
                 </div>
+            }
+        </div>
+        <div class="d-flex justify-content-center mb-4">
+            @if (pageViewModel.HasPreviousPage)
+            {
+                <a href="@Url.Action("Index", new {pageNumber = pageViewModel.PageNumber - 1 })" class="btn btn-secondary me-3">Предыдущая</a>
+            }
+            @if (pageViewModel.HasNextPage)
+            {
+                <a href="@Url.Action("Index", new {pageNumber = pageViewModel.PageNumber + 1 })" class="btn btn-secondary me-3">Следующая</a>
             }
         </div>
     }

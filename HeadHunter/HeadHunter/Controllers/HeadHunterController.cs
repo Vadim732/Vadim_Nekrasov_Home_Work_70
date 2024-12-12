@@ -17,7 +17,7 @@ public class HeadHunterController : Controller
         _userManager = userManager;
         _context = context;
     }
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int pageNumber = 1)
     {
         List<Vacancy> vacancies = _context.Vacancies
             .Where(v => v.IsPublished == true)
@@ -29,7 +29,13 @@ public class HeadHunterController : Controller
             var user = await _userManager.GetUserAsync(User);
             ViewBag.Resumes = _context.Resumes.Where(a => a.UserId == user.Id).ToList();
         }
-        return View(vacancies);
+        int pageSize = 20;
+        int totalVacancies = vacancies.Count();
+        int totalPages = (int)Math.Ceiling((double)totalVacancies / pageSize);
+        var paginatedVacancies = vacancies.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        var pageViewModel = new PageViewModel(totalVacancies, pageNumber, pageSize);
+        ViewBag.PageViewModel = pageViewModel;
+        return View(paginatedVacancies);
     }
     [Authorize(Roles = "employer")]
     public async Task<IActionResult> IndexResumes()
