@@ -17,6 +17,29 @@
     else
     {
         <div class="row row-cols-1 g-3">
+            <div class="mb-2">
+                <a asp-action="Index" asp-controller="HeadHunter" asp-route-sortVacancyState="@ViewBag.SalarySort" class="btn btn-dark">Сортировать по зарплате</a>
+                <form method="get" class="mt-2">
+                    <div class="form-inline border-white border-bottom pb-2">
+                        <p class="text-secondary">Фильтравать по категориям</p>
+                        <select name="category" class="form-select me-2 w-100">
+                            <option value="">Все категории</option>
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category" selected>@category</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-outline-dark mt-1"> Поиск</button>
+                </form>
+                <form method="get" class="mt-2">
+                    <div class="form-inline">
+                        <p class="text-secondary">Введите часть заголовка вакансии для поиска</p>
+                        <input type="text" name="title" value="@ViewContext.HttpContext.Request.Query["title"]" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-dark mt-1">Поиск</button>
+                </form>
+            </div>
             @foreach (var v in Model)
             {
                 <div class="col mb-2">
@@ -36,7 +59,7 @@
                         }
                     </div>
                 </div>
-                
+
                 <div class="modal fade" id="responseModal-@v.Id" tabindex="-1" aria-labelledby="responseModalLabel-@v.Id" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -46,7 +69,7 @@
                             </div>
                             <div class="modal-body">
                                 <form asp-action="SendResponse" asp-controller="HeadHunter" method="post">
-                                    <input type="hidden" name="VacancyId" value="@v.Id" />
+                                    <input type="hidden" name="VacancyId" value="@v.Id"/>
                                     <div class="mb-3">
                                         <label for="resumeSelect-@v.Id" class="form-label">Выберите резюме</label>
                                         <select class="form-select" id="resumeSelect-@v.Id" name="ResumeId" required>

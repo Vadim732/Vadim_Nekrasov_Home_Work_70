@@ -1,4 +1,5 @@
 ﻿using HeadHunter.Models;
+using HeadHunter.Services;
 using HeadHunter.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,24 +18,44 @@ public class HeadHunterController : Controller
         _userManager = userManager;
         _context = context;
     }
-    public async Task<IActionResult> Index(int pageNumber = 1)
+    public async Task<IActionResult> Index(string title, string category = null, SortVacancyState sortVacancyState = SortVacancyState.SalaryAsc, int pageNumber = 1)
     {
-        List<Vacancy> vacancies = _context.Vacancies
-            .Where(v => v.IsPublished == true)
-            .OrderByDescending(v => v.UpdatedAt)
-            .ToList();
+        IQueryable<Vacancy> vacancy = _context.Vacancies.Where(v => v.IsPublished == true).OrderByDescending(v => v.UpdatedAt);
+        if (!string.IsNullOrEmpty(category))
+        {
+            vacancy = vacancy.Where(v => v.Category.Name == category);
+        }
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            vacancy = vacancy.Where(v => v.Title.ToLower().Contains(title.ToLower()));
+        }
+
+        ViewBag.SalarySort = sortVacancyState == SortVacancyState.SalaryAsc ? SortVacancyState.SalaryDesc : SortVacancyState.SalaryAsc;
+        switch (sortVacancyState)
+        {
+            case SortVacancyState.SalaryAsc:
+                vacancy = vacancy.OrderBy(v => v.Salary);
+                break;
+            case SortVacancyState.SalaryDesc:
+                vacancy = vacancy.OrderByDescending(v => v.Salary);
+                break;
+        }
+
+        int pageSize = 20;
+        int totalVacancies = await vacancy.CountAsync();
+        int totalPages = (int)Math.Ceiling((double)totalVacancies / pageSize);
+        var paginatedVacancies = await vacancy.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        var pageViewModel = new PageViewModel(totalVacancies, pageNumber, pageSize);
+        ViewBag.PageViewModel = pageViewModel;
+        ViewBag.Categories = await _context.Categories.Select(c => c.Name).Distinct().ToListAsync();
 
         if (User.IsInRole("applicant"))
         {
             var user = await _userManager.GetUserAsync(User);
             ViewBag.Resumes = _context.Resumes.Where(a => a.UserId == user.Id).ToList();
         }
-        int pageSize = 20;
-        int totalVacancies = vacancies.Count();
-        int totalPages = (int)Math.Ceiling((double)totalVacancies / pageSize);
-        var paginatedVacancies = vacancies.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-        var pageViewModel = new PageViewModel(totalVacancies, pageNumber, pageSize);
-        ViewBag.PageViewModel = pageViewModel;
+
         return View(paginatedVacancies);
     }
     [Authorize(Roles = "employer")]
