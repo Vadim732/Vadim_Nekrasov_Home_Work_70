@@ -27,6 +27,7 @@ public class HeadHunterController : Controller
         }
         return View(vacancies);
     }
+    [Authorize(Roles = "employer")]
     public async Task<IActionResult> IndexResumes()
     {
         List<Resume> resumes = _context.Resumes.Include(r => r.User).Where(r => r.IsPublished == true).ToList();
@@ -70,7 +71,7 @@ public class HeadHunterController : Controller
     }
     [HttpPost]
     [Authorize(Roles = "employer")]
-    public async Task<IActionResult> CreateVacancy(Vacancy vacancy)
+    public async Task<IActionResult> CreateVacancy(Vacancy vacancy) // Проверка на год от и до 
     {
         if (ModelState.IsValid)
         {
@@ -109,7 +110,7 @@ public class HeadHunterController : Controller
     }
     
     [Authorize(Roles = "employer")]
-    public async Task<IActionResult> EditVacancy(int id)
+    public async Task<IActionResult> EditVacancy(int id) // Проверка на год от и до 
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -131,7 +132,7 @@ public class HeadHunterController : Controller
 
     [HttpPost]
     [Authorize(Roles = "employer")]
-    public async Task<IActionResult> EditVacancy(Vacancy vacancy)
+    public async Task<IActionResult> EditVacancy(Vacancy vacancy) // Проверка на год от и до 
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -220,6 +221,18 @@ public class HeadHunterController : Controller
         }
         return View(vacancy);
     }
+
+    public IActionResult DetailsResume(int id)
+    {
+        var resume = _context.Resumes
+            .Include(c => c.Category)
+            .FirstOrDefault(r => r.Id == id);
+        if (resume == null)
+        {
+            return NotFound("Такое резюме не найдено");
+        }
+        return View(resume);
+    }
     [Authorize(Roles = "employer")]
     public IActionResult PublicationVacancy(int id)
     {
@@ -258,6 +271,43 @@ public class HeadHunterController : Controller
     }
     
     [Authorize(Roles = "employer")]
+    public IActionResult UnpublishVacancy(int id)
+    {
+        var vacancy = _context.Vacancies.FirstOrDefault(v => v.Id == id);
+        if (vacancy == null)
+        {
+            return NotFound("Такая вакансия не найдена");
+        }
+        if (vacancy.IsPublished == false)
+        {
+            return NotFound("Эта вакансия уже не опубликована");
+        }
+        vacancy.IsPublished = false;
+        _context.Update(vacancy);
+        _context.SaveChanges();
+        return RedirectToAction("Profile", "Account");
+    }
+
+    [Authorize(Roles = "applicant")]
+    public IActionResult UnpublishResume(int id)
+    {
+        var resume = _context.Resumes.FirstOrDefault(r => r.Id == id);
+        if (resume == null)
+        {
+            return NotFound("Такое резюме не найдено");
+        }
+        if (resume.IsPublished == false)
+        {
+            return NotFound("Это резюме уже не опубликовано");
+        }
+        resume.IsPublished = false;
+        _context.Update(resume);
+        _context.SaveChanges();
+        return RedirectToAction("Profile", "Account");
+    }
+
+    
+    [Authorize(Roles = "employer")]
     public IActionResult UpdateVacancy(int id)
     {
         var vacancy = _context.Vacancies.FirstOrDefault(v => v.Id == id);
@@ -287,7 +337,7 @@ public class HeadHunterController : Controller
 
     [Authorize(Roles = "applicant")]
     [HttpPost]
-    public async Task<IActionResult> SendResponse(int vacancyId, int resumeId)
+    public async Task<IActionResult> SendResponse(int vacancyId, int resumeId) // Сделать проверку чтоб нельзя было отзываться одним и тем же резюме на ту же вакансию
     {
         var user = await _userManager.GetUserAsync(User);
 
@@ -317,7 +367,7 @@ public class HeadHunterController : Controller
     
     [Authorize(Roles = "employer")]
     [HttpPost]
-    public async Task<IActionResult> SendEmployerResponse(int resumeId, int vacancyId)
+    public async Task<IActionResult> SendEmployerResponse(int resumeId, int vacancyId) // Сделать проверку чтоб нельзя было отзываться одним и тем же резюме на ту же вакансию
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)

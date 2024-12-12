@@ -19,11 +19,11 @@
             {
                 <div class="col mb-2">
                     <div class="card shadow-sm">
-                        <div class="card-body">
+                        <a href="@Url.Action("DetailsResume", "HeadHunter", new {id = resume.Id})" class="card-body text-decoration-none">
                             <h5 class="card-title">@resume.Title</h5>
                             <p class="card-text text-muted">Обновлено: @resume.LastUpdated</p>
                             <p class="card-text">Кандидат: @resume.User.UserName</p>
-                        </div>
+                        </a>
                         @if (User.IsInRole("employer"))
                         {
                             <div class="card-footer d-flex justify-content-end">

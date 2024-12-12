@@ -1,0 +1,94 @@
+@model HeadHunter.Models.Resume
+
+@{
+    ViewBag.Title = "Детальная страница резюме";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title">@Model.Title</h1>
+            <div class="d-flex justify-content-between mb-3">
+                <span class="badge bg-info">@Model.Category?.Name</span>
+                <span class="text-muted">@Model.LastUpdated.ToString("dd.MM.yyyy")</span>
+            </div>
+
+            <h5 class="card-subtitle mb-2 text-muted">Ожидаемая зарплата</h5>
+            <p class="card-text">@Model.ExpectedSalary.ToString("C")</p>
+
+            <h5 class="card-subtitle mb-2 text-muted">Контактные данные</h5>
+            <ul>
+                @if (!string.IsNullOrEmpty(Model.Telegram))
+                {
+                    <li><strong>Телеграм:</strong> @Model.Telegram</li>
+                }
+                @if (!string.IsNullOrEmpty(Model.Email))
+                {
+                    <li><strong>Email:</strong> @Model.Email</li>
+                }
+                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                {
+                    <li><strong>Телефон:</strong> @Model.PhoneNumber</li>
+                }
+                @if (!string.IsNullOrEmpty(Model.FacebookLink))
+                {
+                    <li><strong>Facebook:</strong> @Model.FacebookLink</li>
+                }
+                @if (!string.IsNullOrEmpty(Model.LinkedInLink))
+                {
+                    <li><strong>LinkedIn:</strong> @Model.LinkedInLink</li>
+                }
+            </ul>
+
+            <h5 class="card-subtitle mb-2 text-muted">Опыт работы</h5>
+            @if (Model.WorkExperiences.Any())
+            {
+                <ul>
+                    @foreach (var experience in Model.WorkExperiences)
+                    {
+                        <li>
+                            <strong>@experience.Position</strong> в <em>@experience.CompanyName</em><br/>
+                            <span>@experience.StartDate.ToString("MM/yyyy") - @experience.EndDate?.ToString("MM/yyyy")</span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Нет данных о предыдущем опыте работы.</p>
+            }
+
+            <h5 class="card-subtitle mb-2 text-muted">Образование и курсы</h5>
+            @if (Model.EducationAndCourses.Any())
+            {
+                <ul>
+                    @foreach (var education in Model.EducationAndCourses)
+                    {
+                        <li>
+                            <strong>@education.InstitutionName</strong> - <em>@education.DegreeOrCertification</em><br/>
+                            <span>@education.StartDate.ToString("MM/yyyy") - @education.EndDate.ToString("MM/yyyy")</span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Нет данных об образовании или курсах.</p>
+            }
+
+            <div class="mt-4">
+                @if (Model.IsPublished)
+                {
+                    <span class="badge bg-success">Опубликовано</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning">Не опубликовано</span>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "HeadHunter")" class="btn btn-outline-secondary"><i class="fa-solid fa-chevron-left"></i> Назад к резюме</a>
+    </div>
+</div>

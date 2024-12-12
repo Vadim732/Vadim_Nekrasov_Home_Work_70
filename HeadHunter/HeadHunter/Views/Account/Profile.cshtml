@@ -69,7 +69,14 @@
                                 <p class="card-text text-muted">Обновлено: @vacancy.UpdatedAt</p>
                                 <div class="d-flex justify-content-end">
                                     <a asp-action="EditVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-primary btn-sm me-2">Редактировать</a>
-                                    <a asp-action="PublicationVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-warning btn-sm me-2">Опубликовать</a>
+                                    @if (vacancy.IsPublished == true)
+                                    {
+                                        <a asp-action="UnpublishVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-warning btn-sm me-2">Снять с публикации</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="PublicationVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-warning btn-sm me-2">Опубликовать</a>
+                                    }
                                     <a asp-action="UpdateVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-success btn-sm me-2">Обновить</a>
                                     <a asp-action="DeleteVacancy" asp-route-id="@vacancy.Id" asp-controller="HeadHunter" class="btn btn-outline-danger btn-sm">Удалить</a>
                                 </div>
@@ -102,7 +109,14 @@
                                 <p class="card-text text-muted">Обновлено: @resume.LastUpdated</p>
                                 <div class="d-flex justify-content-end">
                                     <a asp-action="EditResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-primary btn-sm me-2">Редактировать</a>
-                                    <a asp-action="PublicationResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-warning btn-sm me-2">Опубликовать</a>
+                                    @if (resume.IsPublished == true)
+                                    {
+                                        <a asp-action="UnpublishResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-warning btn-sm me-2">Снять с публикации</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="PublicationResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-warning btn-sm me-2">Опубликовать</a>
+                                    }
                                     <a asp-action="UpdateResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-success btn-sm me-2">Обновить</a>
                                     <a asp-action="DeleteResume" asp-route-id="@resume.Id" asp-controller="HeadHunter" class="btn btn-outline-danger btn-sm">Удалить</a>
                                 </div>
