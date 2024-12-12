@@ -21,7 +21,7 @@
         <div class="col-md-9">
             <div class="d-flex align-items-center mb-2">
                 <h2 class="me-3">@Model.UserName</h2>
-                @if (!User.IsInRole("admin"))
+                @if (!User.IsInRole("admin") && Model.UserName == User.Identity.Name)
                 {
                     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         <i class="fa-solid fa-user-pen"></i>
@@ -34,28 +34,31 @@
                 <h6 class="text-muted mt-3"><i class="fa-solid fa-phone"></i> @Model.PhoneNumber</h6>
             }
             <h6 class="text-muted mt-1"><i class="fa-solid fa-calendar-days"></i> @Model.DateOfBirth.ToString("dd.MM.yyyy")</h6>
-            <div class="mt-4">
-                @if (User.IsInRole("admin"))
-                {
-                    <a class="btn btn-outline-dark" asp-controller="Account" asp-action="RegisterUser"><i class="fa-solid fa-user-plus"></i> Создать пользователя</a>
-                    <a class="btn btn-outline-dark ml-1" asp-controller="Account" asp-action="Index"><i class="fa-solid fa-users"></i> Все пользователи</a>
-                }
-                @if (User.IsInRole("employer"))
-                {
-                    <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateVacancy"><i class="fa-solid fa-file-circle-plus HHL"></i> Создать Вакансию</a>
-                    <a class="btn btn-outline-dark ml-1" asp-controller="HeadHunter" asp-action="AllResponsesVacancies"><i class="fa-regular fa-envelope text-success"></i> Отклики</a>
-                }
-                @if (User.IsInRole("applicant"))
-                {
-                    <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateResume">Создать Резюме</a>
-                    <a class="btn btn-outline-dark ml-1" asp-controller="HeadHunter" asp-action="MyFeedback"><i class="fa-regular fa-envelope text-success"></i> Мои Отклики</a>
-                }
-            </div>
+            @if (Model.UserName == User.Identity.Name)
+            {
+                <div class="mt-4">
+                    @if (User.IsInRole("admin"))
+                    {
+                        <a class="btn btn-outline-dark" asp-controller="Account" asp-action="RegisterUser"><i class="fa-solid fa-user-plus"></i> Создать пользователя</a>
+                        <a class="btn btn-outline-dark ml-1" asp-controller="Account" asp-action="Index"><i class="fa-solid fa-users"></i> Все пользователи</a>
+                    }
+                    @if (User.IsInRole("employer"))
+                    {
+                        <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateVacancy"><i class="fa-solid fa-file-circle-plus HHL"></i> Создать Вакансию</a>
+                        <a class="btn btn-outline-dark ml-1" asp-controller="HeadHunter" asp-action="AllResponsesVacancies"><i class="fa-regular fa-envelope text-success"></i> Отклики</a>
+                    }
+                    @if (User.IsInRole("applicant"))
+                    {
+                        <a class="btn btn-outline-dark" asp-controller="HeadHunter" asp-action="CreateResume">Создать Резюме</a>
+                        <a class="btn btn-outline-dark ml-1" asp-controller="HeadHunter" asp-action="MyFeedback"><i class="fa-regular fa-envelope text-success"></i> Мои Отклики</a>
+                    }
+                </div>
+            }
         </div>
     </div>
 </div>
 
-@if (User.IsInRole("employer"))
+@if (User.IsInRole("employer") && Model.UserName == User.Identity.Name)
 {
     <div class="mt-4">
         <h3>Вакансии</h3>
@@ -96,7 +99,7 @@
     </div>
 }
 
-@if (User.IsInRole("applicant"))
+@if (User.IsInRole("applicant") && Model.UserName == User.Identity.Name)
 {
     <div class="mt-4">
         <h3>Резюме</h3>

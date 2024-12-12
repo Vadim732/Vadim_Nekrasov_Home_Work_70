@@ -25,9 +25,17 @@ public class AccountController : Controller
     }
     
     [Authorize]
-    public async Task<IActionResult> Profile()
+    public async Task<IActionResult> Profile(string userId = null)
     {
-        User user = await _userManager.GetUserAsync(User);
+        User user = null;
+        if (userId == null)
+        {
+            user = await _userManager.GetUserAsync(User);
+        }
+        else
+        {
+            user = await _userManager.FindByIdAsync(userId);
+        }
 
         if (user != null)
         {
