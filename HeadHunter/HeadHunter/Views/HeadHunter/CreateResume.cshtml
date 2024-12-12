@@ -62,72 +62,26 @@
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </label>
         </div>
-        <div class="form_row mb-3">
-            <label for="WorkExperience_CompanyName" class="col-4">Компания</label>
-            <div class="col-md-6">
-                <input type="text" name="WorkExperiences[0].CompanyName" class="form-control" placeholder="Введите название компании" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="WorkExperience_Position" class="col-4">Должность</label>
-            <div class="col-md-6">
-                <input type="text" name="WorkExperiences[0].Position" class="form-control" placeholder="Введите должность" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="WorkExperience_StartDate" class="col-4">Дата начала</label>
-            <div class="col-md-6">
-                <input type="date" name="WorkExperiences[0].StartDate" class="form-control" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="WorkExperience_EndDate" class="col-4">Дата окончания</label>
-            <div class="col-md-6">
-                <input type="date" name="WorkExperiences[0].EndDate" class="form-control" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="WorkExperience_Responsibilities" class="col-4">Обязанности</label>
-            <div class="col-md-6">
-                <input type="text" name="WorkExperiences[0].Responsibilities" class="form-control" placeholder="Введите обязанности" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="Education_InstitutionName" class="col-4">Учебное заведение</label>
-            <div class="col-md-6">
-                <input type="text" name="EducationAndCourses[0].InstitutionName" class="form-control" placeholder="Введите название учебного заведения" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="Education_DegreeOrCertification" class="col-4">Степень/Сертификат</label>
-            <div class="col-md-6">
-                <input type="text" name="EducationAndCourses[0].DegreeOrCertification" class="form-control" placeholder="Введите степень или сертификат" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="Education_StartDate" class="col-4">Дата начала</label>
-            <div class="col-md-6">
-                <input type="date" name="EducationAndCourses[0].StartDate" class="form-control" />
-            </div>
-        </div>
-
-        <div class="form_row mb-3">
-            <label for="Education_EndDate" class="col-4">Дата окончания</label>
-            <div class="col-md-6">
-                <input type="date" name="EducationAndCourses[0].EndDate" class="form-control" />
-            </div>
-        </div>
-        <button type="submit" class="btn btn-outline-light mb-3 w-25">Создать</button>
+    <div class="form_row mb-3">
+        <label for="WorkExperience_CompanyName" class="col-4">
+            <input type="text" name="WorkExperiences[0].CompanyName" class="form-control" placeholder="Введите название компании" />
+        </label>
+    </div>
+    <div class="form_row mb-3">
+        <label for="WorkExperience_Position" class="col-4">
+            <input type="text" name="WorkExperiences[0].Position" class="form-control" placeholder="Введите должность" />
+        </label>
+    </div>
+    <div class="form_row mb-3">
+        <p class="text-white">Дата начала</p>
+        <label for="WorkExperience_StartDate" class="col-4">
+            <input type="date" name="WorkExperiences[0].StartDate" class="form-control"/>
+        </label>
+    </div>
     </form>
-</div>
 
 @section Scripts{
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+</div>
