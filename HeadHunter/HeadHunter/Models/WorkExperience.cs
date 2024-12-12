@@ -10,5 +10,5 @@ public class WorkExperience
     public string Responsibilities { get; set; }
 
     public int ResumeId { get; set; }
-    public Resume Resume { get; set; }
+    public Resume? Resume { get; set; }
 }

@@ -47,8 +47,12 @@
                     @foreach (var experience in Model.WorkExperiences)
                     {
                         <li>
-                            <strong>@experience.Position</strong> в <em>@experience.CompanyName</em><br/>
-                            <span>@experience.StartDate.ToString("MM/yyyy") - @experience.EndDate?.ToString("MM/yyyy")</span>
+                            <strong>@experience.Position</strong> в <em>@experience.CompanyName</em><br />
+                            <span>
+                                @experience.StartDate.ToString("MM/yyyy") - 
+                                @experience.EndDate.Value.ToString("MM/yyyy")
+                            </span><br />
+                            <p>@experience.Responsibilities</p>
                         </li>
                     }
                 </ul>
@@ -89,6 +93,6 @@
         </div>
     </div>
     <div class="mt-4">
-        <a href="@Url.Action("Index", "HeadHunter")" class="btn btn-outline-secondary"><i class="fa-solid fa-chevron-left"></i> Назад к резюме</a>
+        <a href="@Url.Action("Profile", "Account")" class="btn btn-outline-secondary"><i class="fa-solid fa-chevron-left"></i> Назад В профиль</a>
     </div>
 </div>

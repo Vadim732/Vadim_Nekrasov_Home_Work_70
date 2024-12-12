@@ -9,5 +9,5 @@ public class EducationOrCourse
     public DateTime EndDate { get; set; }
 
     public int ResumeId { get; set; }
-    public Resume Resume { get; set; }
+    public Resume? Resume { get; set; }
 }

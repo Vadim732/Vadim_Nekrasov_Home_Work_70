@@ -145,8 +145,24 @@ public class HeadHunterController : Controller
             var creator = await _userManager.GetUserAsync(User);
             resume.LastUpdated = DateTime.UtcNow;
             resume.UserId = creator.Id;
+            foreach (var education in resume.EducationAndCourses)
+            {
+                if (education.StartDate != default(DateTime))
+                    education.StartDate = education.StartDate.ToUniversalTime();
+                if (education.EndDate != default(DateTime))
+                    education.EndDate = education.EndDate.ToUniversalTime();
+            }
+
+            foreach (var workExperience in resume.WorkExperiences)
+            {
+                if (workExperience.StartDate != default(DateTime))
+                    workExperience.StartDate = workExperience.StartDate.ToUniversalTime();
+                if (workExperience.EndDate.HasValue && workExperience.EndDate.Value != default(DateTime))
+                    workExperience.EndDate = workExperience.EndDate.Value.ToUniversalTime();
+            }
+
             _context.Resumes.Add(resume);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return RedirectToAction("Profile", "Account");
         }
         ViewBag.Categories = _context.Categories.ToList();
@@ -281,6 +297,8 @@ public class HeadHunterController : Controller
     {
         var resume = _context.Resumes
             .Include(c => c.Category)
+            .Include(e => e.EducationAndCourses)
+            .Include(w => w.WorkExperiences)
             .FirstOrDefault(r => r.Id == id);
         if (resume == null)
         {
